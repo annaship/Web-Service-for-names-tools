@@ -25,6 +25,9 @@ get '/' do
 end
 
 get '/neti_tf' do
+  @examples = []
+  @examples = File.open("/Library/Webserver/Documents/sinatra/public/neti_tf_examples.txt").read
+  puts @examples.pretty_inspect
   erb :tf_form
 end
 
@@ -40,7 +43,7 @@ post '/tf_result' do
   params.each do |key, value|
     unless key.start_with?('upload')
       unless value.empty?
-        # @url = "http://localhost/sinatra/master_lists/"+params['url_e'] unless (key == "url_e" && value == "none")
+        @url = params['url_e'] unless (key == "url_e" && value == "none")
         instance_variable_set("@#{key}", value)
       end
     end
@@ -78,7 +81,7 @@ post '/tf_result' do
     # print "\n------------\ndata = %s\n-----------------\n" % data.pretty_inspect
 
     @tf_arr = []
-
+    @i = 0
     data["names"][0]["name"].each do |item|
       # print "item[verbatim][0] = %s\n" % item["verbatim"][0]
       # print "item[scientificName][0] = %s\n" % item["scientificName"][0]
@@ -86,6 +89,7 @@ post '/tf_result' do
       verbatim = item["verbatim"][0]
       sciname  = item["scientificName"][0]
       @tf_arr << [verbatim, sciname]
+      @i += 1
     end
   end
   # print "\n------------\n@tf_arr = %s\n-----------------\n" % @tf_arr.pretty_inspect
@@ -289,19 +293,9 @@ def build_master_lists
   dir_listing.each do |mfile_name| 
     mfile_names << File.basename(mfile_name)
   end
+  puts mfile_names
   return mfile_names
 end
-
-# def upload_file(upload)
-#     time_tmp = Time.now.to_f.to_s   
-#     filename = File.join("#{File.dirname(__FILE__)}/tmp/", time_tmp+upload[:filename])
-#     print "filename = %s\n" % filename
-#     f = File.open(filename, 'wb') 
-#     f.write(upload[:tempfile].read)
-#     f.close
-#     url = "http://localhost/sinatra/"+filename
-#     return url
-# end
 
 def upload_file(upload)
     time_tmp = Time.now.to_f.to_s  
