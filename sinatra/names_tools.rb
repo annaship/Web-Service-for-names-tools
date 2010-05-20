@@ -32,10 +32,10 @@ post '/tf_result' do
   puts "=" * 80
   puts params.inspect
   
-  # unless (params['upload'].empty?)
-  #   upload = params['upload']
-  #   @url = upload_file(upload)
-  # end
+  if (params['upload'] && !params['upload'].empty?)
+    upload = params['upload']
+    @url = upload_file(upload)
+  end
 
   params.each do |key, value|
     unless key.start_with?('upload')
@@ -70,7 +70,6 @@ post '/tf_result' do
     xml_data = RestClient.get URI.encode("http://localhost:4567/find?url=#{@url}")
   elsif @text
     xml_data = RestClient.get URI.encode("http://localhost:4567/find?text=#{@text}")
-    # result = RestClient.get URI.encode("http://localhost:4567/find?text=#{@text}")
     # First we find Mus musculus and then we find Volutharpa ampullacea again                                           
     
   end
@@ -293,12 +292,25 @@ def build_master_lists
   return mfile_names
 end
 
+# def upload_file(upload)
+#     time_tmp = Time.now.to_f.to_s   
+#     filename = File.join("#{File.dirname(__FILE__)}/tmp/", time_tmp+upload[:filename])
+#     print "filename = %s\n" % filename
+#     f = File.open(filename, 'wb') 
+#     f.write(upload[:tempfile].read)
+#     f.close
+#     url = "http://localhost/sinatra/"+filename
+#     return url
+# end
+
 def upload_file(upload)
-    time_tmp = Time.now.to_f.to_s   
-    filename = File.join("#{File.dirname(__FILE__)}/tmp/", time_tmp+upload[:filename])
+    time_tmp = Time.now.to_f.to_s  
+    basename = time_tmp+upload[:filename] 
+    filename = File.join("/Library/Webserver/Documents/sinatra/tmp/", basename)
+    print "filename = %s\n" % filename
     f = File.open(filename, 'wb') 
     f.write(upload[:tempfile].read)
     f.close
-    url = "http://localhost/sinatra/"+filename
+    url = "http://localhost/sinatra/tmp/"+basename
     return url
 end
