@@ -1,9 +1,7 @@
 #!/opt/local/bin/ruby
 
-require 'net/http'
 require 'rubygems'
 require 'sinatra'
-require 'xmlsimple'
 require 'haml'
 require 'rest_client'
 require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
@@ -31,7 +29,7 @@ end
 post '/tf_result' do
   puts "=" * 80
   puts params.inspect
-  
+
   # unless (params['upload'].empty?)
   #   upload = params['upload']
   #   @url = upload_file(upload)
@@ -46,55 +44,23 @@ post '/tf_result' do
     end
   end
   
-  # if @url
-  #   # result = RestClient.get URI.encode("http://localhost:4567/find?url=http://localhost/text_good.txt")
-  #   # http://localhost:4567/find?url=http://localhost/text_good1.txt !!! neti
-  #   result = RestClient.get URI.encode("http://localhost:4567/find?url=#{@url}")
-  # elsif @freetext
-  #   result = RestClient.get URI.encode("http://localhost:4567/find?text=#{@text}")
-  # end
-  # possible_names = []
-  # result.each do |name|
-    # print "result = %s\n" % result.pretty_inspect
-    # {"url"=>"http://localhost/text_good1.txt", "text"=>""}
-    # result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><names xmlns:dwc=\"http://rs.tdwg.org/dwc/terms/\"><name><verbatim>Mus musculus</verbatim><dwc:scientificName>Mus musculus</dwc:scientificName><offsets><offset start=\"0\" end=\"11\"/></offsets></name><name><verbatim>Volutharpa ampullacea</verbatim><dwc:scientificName>Volutharpa ampullacea</dwc:scientificName><offsets><offset start=\"12\" end=\"32\"/></offsets></name></names></response>"
-    
-  # end
-  
-  # @tf_arr = result
-  # print "result.class = %s\n------------------\n" % result.class
-
-  # ------------
   if @url
-    # xml_data = Net::HTTP.get_response(URI.parse("http://localhost:4567/find?url=#{@url}")).body
-    xml_data = RestClient.get URI.encode("http://localhost:4567/find?url=#{@url}")
-  elsif @text
-    xml_data = RestClient.get URI.encode("http://localhost:4567/find?text=#{@text}")
-    # result = RestClient.get URI.encode("http://localhost:4567/find?text=#{@text}")
-    # First we find Mus musculus and then we find Volutharpa ampullacea again                                           
+    
+    result = RestClient.get URI.encode("http://localhost:4567/find?url=http://localhost/text_good.txt")
+    # http://localhost:4567/find?url=http://localhost/text_good1.txt !!! neti
+    # result = RestClient.get URI.encode("http://localhost:4567/find?url=#{@url}")
+  elsif @freetext
+    result = RestClient.get URI.encode("http://localhost:4567/find?text=#{@freetext}")
+  # elsif (@freetext && @url2)
+  #   result = RestClient.get URI.encode("http://localhost:4567/find?text=#{@freetext}{@url2}")
+  end
+  possible_names = []
+  result.each do |name|
+    puts name.pretty_inspect
     
   end
-  if xml_data
-    data = XmlSimple.xml_in(xml_data)
-    # print "\n------------\ndata = %s\n-----------------\n" % data.pretty_inspect
-
-    @tf_arr = []
-
-    data["names"][0]["name"].each do |item|
-      # print "item[verbatim][0] = %s\n" % item["verbatim"][0]
-      # print "item[scientificName][0] = %s\n" % item["scientificName"][0]
-      # 
-      verbatim = item["verbatim"][0]
-      sciname  = item["scientificName"][0]
-      @tf_arr << [verbatim, sciname]
-    end
-  end
-  # print "\n------------\n@tf_arr = %s\n-----------------\n" % @tf_arr.pretty_inspect
-  # ------------
-
-
-  # result = "[#<Name:0x10222af08 @scientific=\"Mus musculus\", @name=\"Mus musculus\", @verbatim=\"Mus musculus\", @end_pos=11, @rank=\"\", @start_pos=0>, #<Name:0x10222ad00 @scientific=\"Volutharpa ampullacea\", @name=\"Volutharpa ampullacea\", @verbatim=\"Volutharpa ampullacea\", @end_pos=32, @rank=\"\", @start_pos=12>]"
   
+  @tf_arr = [1, 2]
   # //parse the xml response and move it to an array
   #     $possible_names = array();
   #     foreach ($xml->names->name as $name) 

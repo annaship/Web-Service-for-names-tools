@@ -1,12 +1,37 @@
 UI for Neti Neti Taxon Finder and Reconciliation tools
 
-1) run py server for neti tf (port 3003)
-2) run py server for reconciliation (port 1234)
-3) run web service for reconciliation (will move this one to common file)
-4) run ./names_tools.rb -p 3001
+1) run py server for neti tf
+2) run web service for neti tf (will move this one to common file)
+3) run py server for reconciliation
+4) run web service for reconciliation (will move this one to common file)
+5) run ./names_tools.rb -p 3001
 
+---------
+Neti Neti TF (server/client - port 1234, service 4567):
+1) run py server for neti tf
+cd /Users/anna/work/web_app/perl_tf/py_server/
+python L-server-test.py 
+
+2) run web service for neti tf (will move this one to common file)
+cd /Users/anna/work/web_app/perl_tf/webservices/ruby/
+ruby taxon_finder_web_service.rb
+----------
+Reconciliation (server/client - port 3002, service 3000):
+3) run py server for reconciliation
+cd /Users/anna/work/sinatra/Web-Service-for-names-tools/py_server/ 
+/py_server 8556$ python recons_server.py
+
+4) run web service for reconciliation (will move this one to common file)
+clear && ruby reconcile_web_service.rb -p 3000 
+---------
+5) run ./names_tools.rb -p 3001
+ruby /Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/names_tools.rb -p 3001
+
+==============
 TODO:
-* move reconciliation web service names_tools.rb
+* move reconciliation web service into names_tools.rb
+* move Neti TF web service into names_tools.rb
 * add xml
 * add json
 * def for tf and rec common parts (params?)
+* strip url

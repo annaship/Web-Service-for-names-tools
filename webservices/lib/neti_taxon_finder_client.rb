@@ -9,7 +9,7 @@ class Object
 end
 
 class NetiTaxonFinderClient
-  def initialize(host = 'localhost', port = 3003)
+  def initialize(host = 'localhost', port = 1234)
     @host = host
     @port = port
     socket
