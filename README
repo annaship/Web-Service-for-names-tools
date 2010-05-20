@@ -1,4 +1,12 @@
-1) run py server for neti tf
-2) run py server for reconciliation
+UI for Neti Neti Taxon Finder and Reconciliation tools
+
+1) run py server for neti tf (port 3003)
+2) run py server for reconciliation (port 1234)
 3) run web service for reconciliation (will move this one to common file)
 4) run ./names_tools.rb -p 3001
+
+TODO:
+* move reconciliation web service names_tools.rb
+* add xml
+* add json
+* def for tf and rec common parts (params?)
