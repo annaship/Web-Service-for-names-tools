@@ -4,6 +4,59 @@ require 'rack/test'
 
 set :environment, :test
 
+describe 'The Neti Neti App' do
+  include Rack::Test::Methods
+
+  def app
+    Sinatra::Application
+  end
+
+  before :all do
+    @URL   = "http://localhost/text_good1.txt"
+    # @text = "First we find Mus musculus and then we find Volutharpa ampullacea again"
+    @text = URI.escape "Those are good: Atys sajidersoni and Ahys sandersoni. We love them."
+    @upload = Rack::Test::UploadedFile.new '/Library/Webserver/Documents/text_good1.txt'
+  end
+
+  it "check index html" do
+    get '/'
+    last_response.should be_ok
+    last_response.body.should include("Neti Neti Taxon Finder") 
+    last_response.body.should include("Scientific Names Reconciliation") 
+  end
+
+  it "check neti_tf form html" do
+    get '/neti_tf'
+    last_response.should be_ok
+    last_response.body.should include("<h3>Neti Neti Taxon Finder</h3>") #put example name here
+  end
+
+  it "should take url and return text" do
+    get "/find", params = {"url"=>@URL, "url_e"=>"none", "text"=>""}
+    last_response.should be_ok
+    last_response.body.should include("Mus musculus")
+  end    
+  
+  it "should take text and return text" do
+    get "/find", params = {"url"=>"", "url_e"=>"none", "text"=>@text}
+    # last_response.should be_ok
+    last_response.body.should include("<td>Ahys sandersoni</td>")
+  end    
+  
+  it "should upload file and return text" do
+    get "/find", params = {"url"=>"", "url_e"=>"", "text"=>"", "upload"=>@upload}
+    last_response.should be_ok
+    last_response.body.should include("Mus musculus")
+  end    
+  
+  it "should take example url and return text" do
+    get "/find", params = {"url"=>"", "url_e"=>"text_good.txt", "text"=>""}
+    last_response.should be_ok
+    last_response.body.should include("Mus musculus")
+  end    
+end
+
+
 describe 'The Reconcile App' do
   include Rack::Test::Methods
 
@@ -18,8 +71,8 @@ describe 'The Reconcile App' do
     @text1 = URI.escape "Atys sajidersoni\nAhys sandersoni"
     @text2 = URI.escape "Atys sandersoni"
     @text3 = URI.escape "Atys sajidersoni\n\rAhys sandersoni"
-    @upload1 = Rack::Test::UploadedFile.new '/Users/anna/work/reconcile-app/webservices/public/text_bad.txt'
-    @upload2 = Rack::Test::UploadedFile.new '/Users/anna/work/reconcile-app/webservices/public/text_good.txt'
+    @upload1 = Rack::Test::UploadedFile.new '/Library/Webserver/Documents/text_bad.txt'
+    @upload2 = Rack::Test::UploadedFile.new '/Library/Webserver/Documents/text_good.txt'
   end
 
   it "check index html" do
