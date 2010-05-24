@@ -4,15 +4,12 @@ require 'net/http'
 require 'rubygems'
 require 'sinatra'
 require 'xmlsimple'
-require 'haml'
 require 'rest_client'
 require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
 require 'nokogiri'
 require 'uri'
 require 'open-uri'
 require 'base64'
-require 'builder'
-require 'active_support'
 require 'ruby-debug'
 
 layout 'layout'
@@ -31,7 +28,7 @@ get '/neti_tf' do
 end
 
 post '/tf_result' do
-  @neti_taxon_finder_web_service_url = "http://localhost:4567"
+  set_address
   puts "=" * 80
   puts params.inspect
   
@@ -79,6 +76,7 @@ end
 
 # -------------
 # reconciliation
+
 get '/recon' do
   @mfile_names = []
   @mfile_names = build_master_lists
@@ -86,7 +84,7 @@ get '/recon' do
 end
 
 post '/submit' do
-  @reconciliation_web_service_url = "http://localhost:3000"
+  set_address
   puts "=" * 80
   puts params.inspect.to_s
   unless (params['upload1'].nil?)
@@ -147,4 +145,10 @@ def upload_file(upload)
     f.close
     url = "http://localhost/sinatra/tmp/"+basename
     return url
+end
+
+def set_address
+  @neti_taxon_finder_web_service_url = "http://localhost:4567"
+  @reconciliation_web_service_url    = "http://localhost:3000"
+  
 end
