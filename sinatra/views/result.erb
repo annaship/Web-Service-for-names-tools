@@ -1,1 +1,20 @@
-/Users/anna/work/reconcile-app/sinatra/views/result.erb
+<h3>Reconciliation Tool</h3>     
+
+<br />
+<table class='nice'>
+	<tr>
+	  <th>Name to compare</th><th></th>
+	  <th>Matched name</th>
+	</tr>   
+	<% @arr.each do |name| 
+		if (name.keys[0] && name.values[0] && !name.keys[0].empty? && !name.keys[0].empty?)	%>
+		<tr>
+			<td><%= name.keys[0] %></td> <td>---></td> <td><%= name.values[0]%></td>
+		</tr>
+		<% end %>
+	<% end %>
+</table>
+
+<br />
+<br />
+<a href='/recon'>Back to form</a>

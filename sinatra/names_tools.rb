@@ -27,7 +27,6 @@ end
 get '/neti_tf' do
   @examples = []
   @examples = File.open("/Library/Webserver/Documents/sinatra/public/neti_tf_examples.txt").read
-  puts @examples.pretty_inspect
   erb :tf_form
 end
 
@@ -39,15 +38,24 @@ post '/tf_result' do
     upload = params['upload']
     @url = upload_file(upload)
   end
+  @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
+  print "\n1) @url = %s\n" % @url
+
 
   params.each do |key, value|
-    unless key.start_with?('upload')
+    unless (key.start_with?('upload') || key.start_with?('url_e'))
       unless value.empty?
-        @url = params['url_e'] unless (key == "url_e" && value == "none")
+        # print "\nkey == \"url_e\": %s" % key == "url_e"
+        # print "\nvalue == \"none\": %s" % value == "none"
+        # print "\n(key == \"url_e\" && value == \"none\"): %s" % (key == "url_e" && value == "none")
+        print "\n key = %s\n" % key
+        print "\n value = %s\n" % value
+        print "\n 2) @url = %s\n" % @url
         instance_variable_set("@#{key}", value)
       end
     end
   end
+  print "\n3) @url = %s\n" % @url
   
   # if @url
   #   # result = RestClient.get URI.encode("http://localhost:4567/find?url=http://localhost/text_good.txt")
@@ -69,10 +77,13 @@ post '/tf_result' do
 
   # ------------
   if @url
+    puts "Here URL--------------"
     # xml_data = Net::HTTP.get_response(URI.parse("http://localhost:4567/find?url=#{@url}")).body
     xml_data = RestClient.get URI.encode("http://localhost:4567/find?url=#{@url}")
   elsif @text
+    puts "here text-----------------"
     xml_data = RestClient.get URI.encode("http://localhost:4567/find?text=#{@text}")
+    # xml_data = RestClient.get URI.encode("http://localhost:4567/find?text=First we find Mus musculus and then we find Volutharpa ampullacea again")
     # First we find Mus musculus and then we find Volutharpa ampullacea again                                           
     
   end
@@ -115,128 +126,6 @@ post '/tf_result' do
   
   erb :tf_result
 end
-# -------------
-# Taxon Finder
-# 
-#  get '/find' do
-#    # Array of allowed formats
-#    @@valid_formats = %w[xml json html]
-#    @@valid_types = %w[text url encodedtext encodedurl]
-# 
-#   puts "-" * 80
-#   puts params.inspect
-#   # {"upload"=>"", "text"=>"", "url"=>"http://localhost/text_good11.txt"}
-#   
-#   @@client = NetiTaxonFinderClient.new 'localhost' 
-#   format = @@valid_formats.include?(params[:format]) ? params[:format] : "html"
-#   
-#   params.each do |key, value|
-#     unless value.empty?
-#       puts "\nvalue.not_empty.each: "
-#       puts key.pretty_inspect
-#       @content = value
-#     end
-#     unless value.blank?
-#       puts "\nvalue.not_blank.each: "
-#       puts key.pretty_inspect
-#     end
-#     unless value.nil?
-#       puts "\nvalue.not_nil.each: "
-#       puts key.pretty_inspect
-#     end
-#   end
-#   
-#   begin
-#     # if params[:text] 
-#     #   puts "params[:text]\n"
-#     # end
-#     # if params[:url] 
-#     #   puts "params[:url]\n"
-#     # end
-#     # if params[:encodedtext] 
-#     #   puts "params[:encodedtext]\n"
-#     # end
-#     # if params[:encodedurl]
-#     #   puts "params[:encodedurl]\n"
-#     # end
-#     # if params[:upload] 
-#     #   puts "params[:url]\n"
-#     # end
-#     # puts "I'm here! In begin"
-#     # content = params[:text] || params[:url] || params[:encodedtext] || params[:encodedurl]
-#     content = @content
-#     print "content1 = %s\n" % content.pretty_inspect
-#   rescue
-#     status 400
-#   end
-#   content = URI.unescape content
-#   print "content2 = %s\n" % content
-#   # decode if it's encoded
-#   content = Base64::decode64 content if params[:encodedtext] || params[:encodedurl]
-#   print "content3 = %s\n" % content
-#   # scrape if it's a url
-#   unless (params[:upload].empty? || params[:upload] == "none")
-#     puts "UUUU"
-#     upload = params[:upload]
-#     @url = upload_file(upload)
-#   end
-#   
-#   unless (params[:url].empty?)
-#     begin
-#       response = open(content.to_s)
-#       print "response = %s\n" % response
-#       pure_text = open(content.to_s).read
-#       print "pure_text = %s\n" % pure_text
-#     rescue
-#       status 400
-#     end
-#     content = pure_text if pure_text
-#     print "content4 = %s\n" % content
-#     # use nokogiri only for HTML, because otherwise it stops on OCR errors
-#     # content = Nokogiri::HTML(response).content if pure_text.include?("<html>")    
-#     content = Nokogiri::HTML(response).content if (pure_text && pure_text.include?("<html>"))    
-#     print "content5 = %s\n" % content
-#   end
-#   names = @@client.find(content)
-#   # print "names = "+names.inspect.to_s
-#   tf_arr = {}
-#   names.each do |n|
-#     tf_arr[n.verbatim] = n.scientific
-#     # print "n = %s, n.scientific = %s\nn.verbatim = %s\n" % [n.inspect.to_s, n.scientific, n.verbatim]
-#     # puts n.instance_variables
-#   end
-#   @tf_arr = tf_arr
-#   # puts @tf_arr.pretty_inspect
-# 
-#   if format == 'json'
-#     content_type 'application/json', :charset => 'utf-8'
-#     return Hash.from_xml("#{to_xml(names)}").to_json
-#   end
-#   if format == 'xml'
-#     content_type 'text/xml', :charset => 'utf-8'
-#     to_xml(names)
-#   end
-#   erb :tf_result
-# end
-# 
-# def to_xml(names)
-#   xml = Builder::XmlMarkup.new
-#   xml.instruct!
-#   xml.response do
-#     xml.names("xmlns:dwc" => "http://rs.tdwg.org/dwc/terms/") do
-#       names.each do |name|
-#         xml.name do
-#           xml.verbatim name.verbatim
-#           xml.dwc(:scientificName, name.scientific)
-#           xml.offsets do
-#             xml.offset(:start => name.start_pos, :end => name.end_pos)
-#           end
-#         end
-#       end    
-#     end
-#   end
-# end
-
 
 # -------------
 # reconciliation
@@ -293,7 +182,7 @@ def build_master_lists
   dir_listing.each do |mfile_name| 
     mfile_names << File.basename(mfile_name)
   end
-  puts mfile_names
+  # puts mfile_names
   return mfile_names
 end
 
@@ -301,7 +190,7 @@ def upload_file(upload)
     time_tmp = Time.now.to_f.to_s  
     basename = time_tmp+upload[:filename] 
     filename = File.join("/Library/Webserver/Documents/sinatra/tmp/", basename)
-    print "filename = %s\n" % filename
+    # print "filename = %s\n" % filename
     f = File.open(filename, 'wb') 
     f.write(upload[:tempfile].read)
     f.close

@@ -1,1 +1,29 @@
-/Users/anna/work/reconcile-app/sinatra/views/tf_form.erb
+<h3>Neti Neti Taxon Finder</h3>     
+
+<form method="post" action="/tf_result" enctype="multipart/form-data" >
+	<table class='simple'>
+		<tr>
+			<td class="label">Example URLs:</td>
+			<td>
+				<select name="url_e" >
+					<option selected value='none' %> - - Choose an Example URL - -</option>
+					<% @examples.each do |example| %>
+						<option class='pretty'> <%= example %> </option>
+          <% end %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+	    <td class="label">Upload File:</td>
+	    <td><input type='file' size='48' name='upload'></td>
+		<tr>
+	    <td class="label">Enter URL:</td>
+	    <td><input type='text' size='58' name='url'></td>
+		<tr>
+	    <td class="label">Enter Free Text:</td>
+	    <td><textarea rows='3' cols='51' name='text'></textarea></td>
+		</tr>
+	</table>
+	<br/>
+	<input type=submit value='Submit'>
+</form>

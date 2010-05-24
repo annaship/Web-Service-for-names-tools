@@ -1,1 +1,20 @@
-/Users/anna/work/reconcile-app/sinatra/views/tf_result.erb
+<h3>Neti Neti Taxon Finder</h3>     
+
+<br/>
+<p/> Total strings: <%= @i %>
+<br />
+<table class='nice'>
+	<tr>
+    <th>Verbatim String (as appears in text)</th>
+    <th>Scientific name</th>
+	</tr> 
+	<% if @tf_arr %>
+		<% @tf_arr.each do |name| %>
+			<tr><td><%= name[0] %></td><td><%= name[1] %></td></tr>
+		<% end %>
+	<% end %>
+</table>
+
+<br />
+<br />
+<a href='/neti_tf'>Back to form</a>

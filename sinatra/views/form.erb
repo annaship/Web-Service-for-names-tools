@@ -1,1 +1,40 @@
-/Users/anna/work/reconcile-app/sinatra/views/form.erb
+<h3>Reconciliation Tool</h3>     
+
+<form method="post" action="/submit" enctype="multipart/form-data" >
+	<table class='simple'>
+		<tr>
+			<th></th><th>List to compare</th><th></th><th>Master list</th>
+		</tr>
+		<tr>
+			<td></td><td></td>
+			<td class="label">Master list URLs:</td>
+			<td>
+				<select name="url_e" >
+					<option selected value='none' %> - - Choose an Master list URL - -</option>
+					<% @mfile_names.each do |mfile_name| %>
+						<option class='pretty'> <%= mfile_name %> </option>
+          <% end %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+	    <td class="label">Upload File 1:</td>
+	    <td><input type='file' name='upload1' size='48'/></td>
+	    <td class="label">Upload file 2:</td>
+	    <td><input type='file' name='upload2' size='48'/></td></tr>
+		<tr>
+	    <td class="label">Enter URL 1:</td>
+	    <td><input type=text size=58 name=url1></td>
+	    <td class="label">Enter URL 2:</td>
+	    <td><input type=text size=58 name=url2></td></tr>
+		<tr>
+	    <td class="label">Enter Free Text:</td>
+	    <td><textarea rows='3' cols='51' name='freetext1'></textarea></td>
+	    <td class="label">Enter Free Text:</td>
+	    <td><textarea rows='3' cols='51' name='freetext2'></textarea></td>
+		</tr>
+	</table>
+	<br/>
+	<input type=submit value='Submit'>
+	<!-- <input type=hidden name=func value=submit> -->
+</form>
