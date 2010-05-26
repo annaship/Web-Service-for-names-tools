@@ -9,32 +9,32 @@ body
   padding: 20px 0
   font: 0.8em/1.5 "arial", sans-serif
   text-align: center
-  background: #FFF
-  color: #000
+  background: white
+  color: black
 
 /*div#content {
- *	margin-left: auto;
- *	margin-right: auto;
- *	width: 80%;
- *}
+ * *	margin-left: auto;
+ * *	margin-right: auto;
+ * *	width: 80%;
+ * *}
 /*h1, h2 {margin: 15px 0 10px 0;}
- *h3, h4, h5, h6 {margin: 5px 0 10px 0;}
- *h1 {font-size: 260%; font-weight: normal; letter-spacing: -1px;}
- *h2 {font-size: 160%; font-weight: normal;}
- *h3 {font-size: 140%; font-weight: normal;}
- *h4, h5 {font-size: 100%;}
+ * *h3, h4, h5, h6 {margin: 5px 0 10px 0;}
+ * *h1 {font-size: 260%; font-weight: normal; letter-spacing: -1px;}
+ * *h2 {font-size: 160%; font-weight: normal;}
+ * *h3 {font-size: 140%; font-weight: normal;}
+ * *h4, h5 {font-size: 100%;}
 /*p, ul, ol, dl, fieldset {margin: 10px 0;}
- *table {margin-left: auto; margin-right: auto; border-collapse: collapse; border-spacing: 0; font-size: 100%;}
+ * *table {margin-left: auto; margin-right: auto; border-collapse: collapse; border-spacing: 0; font-size: 100%;}
 /*th {text-align: left; font-weight: bold;}
-
 /*th, td {padding: 3px 7px;}
-
 /*ul, ol {margin-left: 30px;}
- *ul ul, ol ol {margin: 0; margin-left: 20px;}
- *ol {list-style-type: decimal;}
- *li {display: list-item;}
+ * *ul ul, ol ol {margin: 0; margin-left: 20px;}
+ * *ol {list-style-type: decimal;}
+ * *li {display: list-item;}
 /*form {width: 70%;}
 /*form {margin-left: auto; margin-right: auto;}
+
+/* form
 
 form p label
   float: left
@@ -44,10 +44,12 @@ form p label
 
 input[type="submit"]
   padding: 2px
-  font: normal 100%/1.2 "arial",sans-serif
-  border: 0.1em solid #46a912
-  background: #46a912
-  color: #FFF
+  font: normal 100%/1.2 "arial", sans-serif
+  border: 0.1em solid #1E90FF
+  background: #1E90FF
+  color: white
+
+/*46a912
 
 td.label
   float: left
@@ -57,12 +59,20 @@ td.label
 option.pretty
   padding-left: 0.1em
 
-.my_input
-  width: 100%
-  background: #f6f6f6
+textarea#my_textarea
+  height: 10ex
+  width: 35em
 
-/*input.my_size  {size: 100%; background:#ededed;}
-/*textarea.my_width {width: 34em;}
+input
+  &#my_input
+    width: 41em
+  &#my_upload
+    size: 41em
+
+/*#my_select {width: 300px}
+ *
+ *#my_upload
+/* form end
 
 /*div#wrapper {text-align: center;}
 
@@ -99,74 +109,32 @@ th
 /* menu group
 
 #menu
-  width: 100%
-  background: #ffffff
-  float: left
-  border-bottom: 1px solid #ccc
+  position: absolute
+  text-align: left
+  padding-left: 0.2em
   ul
-    list-style: none
-    margin: 0
-    padding: 0
-    width: 13em
-    float: left
-    background: #f6f6f6
-    a
-      font: wider  12px/16px arial, helvetica, sans-serif
-      font-weight: bold
-      color: #317b94
-      text-transform: uppercase
+    .item
+      display: none
+    &:hover .item
       display: block
-      border-right: 1px solid #ccc
-      border-top: 1px solid #ccc
-      margin: 0
-      padding: 5px 5px
-  a.first
-    border-right: 1px solid #ccc
-    border-left: 1px solid #ccc
-    border-top: 1px solid #ccc
-  ul li ul
-    a
-      border: none
-      background: #fff
-      color: #3d6876
-      &:hover
-        background: #a2d9ec
+      background: #f6f6f6
+      padding: 1px
+      margin: 1px
+      a
         color: #fff
-    border: 1px solid #3d6876
-  a
-    color: #000
+        text-decoration: none
+        &:hover
+          color: #999
+    width: 100px
+    margin: 0px
+    padding: 2px
     background: #f6f6f6
-    text-decoration: none
-    &:hover
-      color: #fff
-      background: #45b4da
-  li
-    position: relative
-  ul ul
-    ul
-      position: absolute
-      top: 0
-      left: 100%
-    position: absolute
-    z-index: 500
+    list-style: none
 
-/*Next we will create list object for our css menu
+/*#menu ul{width:100px;float:left;margin:0px;padding:2px;background:#f6f6f6;list-style:none;}
 
-/*Anchor tag css drop down menu styling of first ul layer
-
-/*Nice bordering to the first a tag to fit all the design
-
-/*Designing secondary lists and a tags of our css dropdown menu
-
-/*All menu that opened on hover
-
-div#menu ul
-  ul, li:hover ul ul, ul li:hover ul ul
-    display: none
-  li:hover ul
-    display: block
-  ul
-    li:hover ul, ul li:hover ul
-      display: block
+.clear
+  clear: both
+  height: 10px
 
 /* menu end

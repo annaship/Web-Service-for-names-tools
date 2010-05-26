@@ -17,7 +17,6 @@ layout 'layout'
 ### Public
 
 get '/' do
-  # puts "Hello there!"
   erb :index
 end
 
@@ -48,14 +47,10 @@ post '/tf_result' do
   end
   
   if @url
-    a1 = @neti_taxon_finder_web_service_url
-    # +"/find?url=#{@url}"
-    puts a1
     # xml_data = Net::HTTP.get_response(URI.parse("http://localhost:4567/find?url=#{@url}")).body
     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
   elsif @text
     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
-    # xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=First we find Mus musculus and then we find Volutharpa ampullacea again")
     # First we find Mus musculus and then we find Volutharpa ampullacea again                                           
     
   end
