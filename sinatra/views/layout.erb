@@ -11,21 +11,22 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
  </head>
 <body>
-<div id="wrapper">
-	<div id="header">
-		<h2>Scientific Names Tools</h2>     
+	<div id="wrapper">
+		<div id="header">
+			<h2>Scientific Names Tools</h2>     
+			<br />
+		</div> <!-- header end-->
+
+		<div id="content">
+			<%= yield %>
+		</div>
+	</div> <!-- wrapper end-->
+
+	<!-- <div id="footer">
 		<br />
-	</div> <!-- header end-->
-
-	<div id="content">
-		<%= yield %>
-	</div>
-</div> <!-- wrapper end-->
-
-<div id="footer">
-	<br />
-	<br />
-	<a href='/'>Back to index</a>
-</div> <!-- footer end -->
+		<br />
+		<a href='/'>Back to index</a>
+	</div>  -->
+	<!-- footer end -->
 </body>
 </html>

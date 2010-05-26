@@ -39,9 +39,7 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
 	            total_data.append(data)
         t_data = ''.join(total_data)
         time.sleep(2)
-        # reconciliation_res = dummy_comparison(text1, text2)
         self.request.send(nf.find_names(t_data))
-        print "nf.find_names(t_data) = %s\n" % nf.find_names(t_data)
         print "Connection %s closed." % conn_name[1]
 
 if __name__ == "__main__":
