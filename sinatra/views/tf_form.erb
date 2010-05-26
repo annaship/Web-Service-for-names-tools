@@ -1,11 +1,12 @@
 <h3>Neti Neti Taxon Finder</h3>     
 
+<a href='/neti_tf'>Start over</a>
 <form method="post" action="/tf_result" enctype="multipart/form-data" >
 	<table class='simple'>
 		<tr>
 			<td class="label">Example URLs:</td>
 			<td>
-				<select name="url_e" >
+				<select name="url_e" class='my_input'>
 					<option selected value='none' %> - - Choose an Example URL - -</option>
 					<% @examples.each do |example| %>
 						<option class='pretty'> <%= example %> </option>
@@ -15,13 +16,13 @@
 		</tr>
 		<tr>
 	    <td class="label">Upload File:</td>
-	    <td><input type='file' size='48' name='upload'></td>
+	    <td><input type='file' class='my_input' name='upload'></td>
 		<tr>
 	    <td class="label">Enter URL:</td>
-	    <td><input type='text' size='58' name='url'></td>
+	    <td><input type='text' class='my_input' name='url'></td>
 		<tr>
 	    <td class="label">Enter Free Text:</td>
-	    <td><textarea rows='3' cols='51' name='text'></textarea></td>
+	    <td><textarea rows='3' class='my_input' name='text'></textarea></td>
 		</tr>
 	</table>
 	<br/>

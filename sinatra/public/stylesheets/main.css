@@ -60,6 +60,10 @@ td.label{
 
 option.pretty {padding-left: 0.1em;}
 
+.my_input {width: 100%; background:#f6f6f6;}
+/*input.my_size  {size: 100%; background:#ededed;}*/
+/*textarea.my_width {width: 34em;}*/
+
 /*div#wrapper {text-align: center;}*/
 table {
 	margin-left: auto;

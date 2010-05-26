@@ -1,7 +1,17 @@
 <h3>Neti Neti Taxon Finder</h3>     
 
 <br/>
+<form action="/neti_tf" method="get">                               
+<input type="submit" name="submit" value="Start over" />                         
+</form>                                                                                 
+
+<!-- <a href='/neti_tf'>Start over</a> -->
+<br/>
+
 <p/> Total strings: <%= @i %>
+<p>Reading <a href=<%= @url %> target='new'><%= @url %></a></p>
+
+
 <br />
 <table class='nice'>
 	<tr>
@@ -15,6 +25,3 @@
 	<% end %>
 </table>
 
-<br />
-<br />
-<a href='/neti_tf'>Back to form</a>
