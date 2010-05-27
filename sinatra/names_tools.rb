@@ -20,6 +20,7 @@ get '/' do
   erb :index
 end
 
+# NentiNeti Taxon Finder
 get '/neti_tf' do
   @examples = []
   @examples = File.open("/Library/Webserver/Documents/sinatra/public/neti_tf_examples.txt").read
@@ -27,7 +28,11 @@ get '/neti_tf' do
 end
 
 post '/tf_result' do
+  # set ports and addresses
   set_address
+  # set variabe from params
+  set_vars
+
   puts "=" * 80
   puts params.inspect
   
@@ -37,15 +42,6 @@ post '/tf_result' do
   end
   @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
 
-
-  params.each do |key, value|
-    unless (key.start_with?('upload') || key.start_with?('url_e'))
-      unless value.empty?
-        instance_variable_set("@#{key}", value)
-      end
-    end
-  end
-  
   if @url
     # xml_data = Net::HTTP.get_response(URI.parse("http://localhost:4567/find?url=#{@url}")).body
     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
@@ -70,16 +66,21 @@ post '/tf_result' do
 end
 
 # -------------
-# reconciliation
+# Reconciliation
 
 get '/recon' do
   @mfile_names = []
   @mfile_names = build_master_lists
-  erb :form
+  erb :rec_form
 end
 
 post '/submit' do
+  
+  # set ports and addresses
   set_address
+  # set variabe from params
+  set_vars
+
   puts "=" * 80
   puts params.inspect.to_s
   unless (params['upload1'].nil?)
@@ -90,15 +91,8 @@ post '/submit' do
     upload = params['upload2']
     @url2 = upload_file(upload)
   end
+  @url2 = "http://localhost/sinatra/master_lists/"+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
   
-  params.each do |key, value|
-    unless key.start_with?('upload')
-      unless value.empty?
-        @url2 = "http://localhost/sinatra/master_lists/"+params['url_e'] unless (key == "url_e" && value == "none")
-        instance_variable_set("@#{key}", value)
-      end
-    end
-  end
 
   if (@url1 && @url2)
 # http://localhost:3000/match?url1=http://localhost/text_bad.txt&url2=http://localhost/text_good.txt !!! rec
@@ -118,7 +112,7 @@ post '/submit' do
   
   # # clean up tmp if exist
   # `rm #{File.dirname(__FILE__)}/tmp/*`
-  erb :result
+  erb :rec_result
 end
 
 def build_master_lists
@@ -145,5 +139,15 @@ end
 def set_address
   @neti_taxon_finder_web_service_url = "http://localhost:4567"
   @reconciliation_web_service_url    = "http://localhost:3000"
-  
+end
+
+# set variabe from params
+def set_vars
+  params.each do |key, value|
+    unless key.start_with?('upload')
+      unless value.empty?
+        instance_variable_set("@#{key}", value)
+      end
+    end
+  end
 end
