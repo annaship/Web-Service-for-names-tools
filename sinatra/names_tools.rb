@@ -25,7 +25,7 @@ get '/neti_tf' do
   # set ports and addresses
   set_address
   @examples = []
-  @examples = File.open(@host_sinatra+"public/neti_tf_examples.txt").read
+  @examples = File.open(@host_sinatra+"/public/texts/neti_tf_examples.txt").read
   erb :tf_form
 end
 
@@ -35,8 +35,8 @@ post '/tf_result' do
   # set variabe from params
   set_vars
 
-  # puts "=" * 80
-  # puts params.inspect
+  puts "=" * 80
+  puts params.inspect
   
   # @url = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
   @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
@@ -82,8 +82,8 @@ post '/submit' do
   # set variabe from params
   set_vars
 
-  # puts "=" * 80
-  # puts params.inspect.to_s
+  puts "=" * 80
+  puts params.inspect.to_s
 
   # @url1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
   # @url2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
@@ -120,14 +120,40 @@ def build_master_lists
 end
 
 def upload_file(upload)
-    time_tmp = Time.now.to_f.to_s  
-    basename = time_tmp+upload[:filename] 
-    filename = File.join(@host_sinatra+"tmp/", basename)
-    f = File.open(filename, 'wb') 
-    f.write(upload[:tempfile].read)
-    f.close
-    url = @tmp_dir_host+basename
-    return url
+  puts upload.pretty_inspect
+  name = upload[:filename]
+  puts "Uploading file, original name #{name.inspect}"
+
+  # write tmpfile on comp
+  time_tmp  = Time.now.to_f.to_s  
+
+  tmpfile   = upload[:tempfile]
+  while blk = tmpfile.read(65536)
+    puts "8" * 80
+    # text = blk.inspect
+    text = URI.escape blk
+    # text = URI.unescape(blk)
+    # URI.unescape(url).strip
+    # URI.escape
+    puts text
+  end
+
+    # basename = upload[:filename] 
+    # # filename = File.join(@tmp_dir_host, basename)
+    # # filename = "/Library/Webserver/Documents/sinatra/tmp/"+time_tmp+basename
+    # filename = "/Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
+    # puts "8" * 80
+    # print "filename = %s\n" % filename
+    # f = File.open(filename, 'wb') 
+    # f.write(upload[:tempfile].read)
+    # print "upload[:tempfile] = %s\n" % upload[:tempfile].pretty_inspect
+    # f.close
+    # # url = @tmp_dir_host+basename
+    # # url = @tmp_dir_host+time_tmp+basename
+    # url = "file:///Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
+    # print "url = %s\n" % url
+    # puts "8" * 80
+  return text
 end
 
 def set_address
@@ -135,7 +161,8 @@ def set_address
   
   @neti_taxon_finder_web_service_url = @host_name+":4567"
   @reconciliation_web_service_url    = @host_name+":3000"
-  @host_sinatra     = "/Library/Webserver/Documents/sinatra/"
+  @host_sinatra     = File.dirname(__FILE__)
+  # @host_sinatra     = "/Library/Webserver/Documents/sinatra/"
   @tmp_dir_host     = @host_name+"/sinatra/tmp/"
   @master_lists_dir = @host_name+"/sinatra/master_lists/"
 end
@@ -149,9 +176,9 @@ def set_vars
       end
     end
   end
-  @url1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
-  @url2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
-  @url  = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
+  @freetext1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
+  @freetext2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
+  @text  = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
   
   @url  = clean_url(@url) if @url
   @url1 = clean_url(@url1) if @url1

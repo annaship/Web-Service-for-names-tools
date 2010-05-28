@@ -19,8 +19,9 @@
 <br/>
 
 <p/> Total strings: <%= @i %>
-<p>Reading <a href=<%= @url %> target='new'><%= @url %></a></p>
-
+<% if @url %>
+	<p>Reading <a href=<%= @url %> target='new'><%= @url %></a></p>
+<% end %>
 
 <br />
 <table class='nice'>
