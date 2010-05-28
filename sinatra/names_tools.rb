@@ -22,8 +22,10 @@ end
 
 # NentiNeti Taxon Finder
 get '/neti_tf' do
+  # set ports and addresses
+  set_address
   @examples = []
-  @examples = File.open("/Library/Webserver/Documents/sinatra/public/neti_tf_examples.txt").read
+  @examples = File.open(@host_sinatra+"public/neti_tf_examples.txt").read
   erb :tf_form
 end
 
@@ -120,19 +122,22 @@ end
 def upload_file(upload)
     time_tmp = Time.now.to_f.to_s  
     basename = time_tmp+upload[:filename] 
-    filename = File.join(@tmp_dir, basename)
+    filename = File.join(@host_sinatra+"tmp/", basename)
     f = File.open(filename, 'wb') 
     f.write(upload[:tempfile].read)
     f.close
-    url = "http://localhost/sinatra/tmp/"+basename
+    url = @tmp_dir_host+basename
     return url
 end
 
 def set_address
-  @neti_taxon_finder_web_service_url = "http://localhost:4567"
-  @reconciliation_web_service_url    = "http://localhost:3000"
-  @tmp_dir          = "/Library/Webserver/Documents/sinatra/tmp/"
-  @master_lists_dir = "http://localhost/sinatra/master_lists/"
+  @host_name = "http://localhost"
+  
+  @neti_taxon_finder_web_service_url = @host_name+":4567"
+  @reconciliation_web_service_url    = @host_name+":3000"
+  @host_sinatra     = "/Library/Webserver/Documents/sinatra/"
+  @tmp_dir_host     = @host_name+"/sinatra/tmp/"
+  @master_lists_dir = @host_name+"/sinatra/master_lists/"
 end
 
 # set variabe from params
@@ -151,44 +156,10 @@ def set_vars
   @url  = clean_url(@url) if @url
   @url1 = clean_url(@url1) if @url1
   @url2 = clean_url(@url2) if @url2
-
-  # print "@url = %s|\n" % @url if @url
-  
-  # @url.gsub!(/(%20)+$/, '') if @url
-  # @url1.gsub!(/(%20)+$/, '') if @url1
-  # @url2.gsub!(/(%20)+$/, '') if @url2
 end
-
-# if @url1
-#   print "@url1 = %s|\n" % @url1
-#      # "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
-#   print "@url1.gsub(/(20+)$/, '') = %s|\n" % @url1.gsub(/(%20)+$/, '')
-#   print "@url1.strip = %s|\n" % @url1.strip
-#   @url1 = @url1.strip
-# end
 
 def clean_url(url)
-  print "url = %s|\n" % url
-  # CGI::escape(@page.name)
-
-  
-  # good_url = URI.escape(url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
   # good_url = URI.escape(URI.unescape(url).strip, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
   good_url = URI.unescape(url).strip
-  print "good_url = %s|\n" % good_url
   return good_url
 end
-# require 'uri'
-# foo = "http://google.com?query=hello"
-# 
-# bad = URI.escape(foo)
-# good = URI.escape(foo, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-# 
-# bad_uri = "http://mysite.com?service=#{bad}&bar=blah"
-# good_uri = "http://mysite.com?service=#{good}&bar=blah"
-# 
-# puts bad_uri
-# # outputs "http://mysite.com?service=http://google.com?query=hello&bar=blah"
-# 
-# puts good_uri
-# # outputs "http://mysite.com?service=http%3A%2F%2Fgoogle.com%3Fquery%3Dhello&bar=blah"
