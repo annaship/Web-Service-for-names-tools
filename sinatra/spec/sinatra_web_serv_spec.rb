@@ -14,6 +14,8 @@ describe 'The Neti Neti App' do
 
   before :all do
     @URL    = "http://localhost/text_good1.txt"
+    @wrongURL1 = "http://localhost/text_good1.txt   "
+    @wrongURL2 = "http://localhost/text_good1.txt%20%20%20"
     @text   = URI.escape "Those are good: Atys sajidersoni and Ahys sandersoni. We love them."
     @upload = Rack::Test::UploadedFile.new '/Library/Webserver/Documents/text_good1.txt'
     @url_e  = "http://species.asu.edu/2009_species05"
@@ -36,7 +38,19 @@ describe 'The Neti Neti App' do
     post "/tf_result", params = {"url"=>@URL, "url_e"=>"none", "text"=>""}
 #    last_response.should be_ok
     last_response.body.should include("Mus musculus")
-  end    
+  end 
+  
+  it "should take url with spaces and return text" do
+    post "/tf_result", params = {"url"=>@wrongURL1, "url_e"=>"none", "text"=>""}
+    last_response.should be_ok
+    last_response.body.should include("Mus musculus")
+  end 
+     
+  it "should take url with %20 and return text" do
+    post "/tf_result", params = {"url"=>@wrongURL2, "url_e"=>"none", "text"=>""}
+    last_response.should be_ok
+    last_response.body.should include("Mus musculus")
+  end 
   
   it "should take text and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@text}
@@ -72,6 +86,8 @@ describe 'The Reconcile App' do
     @bad_URL   = "http://localhost/text_bad.txt"
     @good_URL  = "http://localhost/text_good.txt" 
     @long_URL  = "http://localhost/pictorialgeo.txt"
+    @wrong_URL1 = "http://localhost/text_bad.txt&url2=http://localhost/text_good.txt%20%20%20"
+    @wrong_URL2 = "http://localhost/text_bad.txt&url2=http://localhost/text_good.txt   "
     @text1 = URI.escape "Atys sajidersoni\nAhys sandersoni"
     @text2 = URI.escape "Atys sandersoni"
     @text3 = URI.escape "Atys sajidersoni\n\rAhys sandersoni"
@@ -133,4 +149,17 @@ describe 'The Reconcile App' do
 #    last_response.should be_ok
     last_response.body.should include("<td>Atys sajidersoni</td> <td>---></td> <td>Ahys sandersoni</td>")
   end    
+
+  it "should take url wth spaces at the end and example url and return text" do
+    post "/submit", params = {"url1"=>@wrong_URL2, "url2"=>"", "url_e"=>"text_good.txt", "freetext1"=>"", "freetext2"=>""}
+     last_response.should be_ok
+    last_response.body.should include("<td>Ahys sandersoni</td> <td>---></td> <td>Atys sandersoni</td>")
+  end    
+
+  it "should take url wth %20 at the end and example url and return text" do
+    post "/submit", params = {"url1"=>@wrong_URL1, "url2"=>"", "url_e"=>"text_good.txt", "freetext1"=>"", "freetext2"=>""}
+     last_response.should be_ok
+    last_response.body.should include("<td>Ahys sandersoni</td> <td>---></td> <td>Atys sandersoni</td>")
+  end    
+
 end
