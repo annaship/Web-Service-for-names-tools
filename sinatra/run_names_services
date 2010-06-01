@@ -1,0 +1,10 @@
+#! /bin/bash
+
+cd /Users/anna/work/sinatra/Web-Service-for-names-tools/py_server/
+python L-server-test.py &
+python recons_server.py &
+cd /Users/anna/work/sinatra/Web-Service-for-names-tools/webservices/
+ruby taxon_finder_web_service.rb &
+ruby reconcile_web_service.rb -p 3000 &
+cd /Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/
+ruby names_tools.rb -p 3001 &
