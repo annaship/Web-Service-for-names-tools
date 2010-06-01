@@ -26,7 +26,7 @@ get '/neti_tf' do
   # set ports and addresses
   set_address
   @examples = []
-  @examples = File.open(@host_sinatra+"/public/texts/neti_tf_examples.txt").read
+  @examples = File.open(File.dirname(__FILE__)+"/public/texts/neti_tf_examples.txt").read
   erb :tf_form
 end
 
@@ -36,8 +36,8 @@ post '/tf_result' do
   # set variabe from params
   set_vars
 
-  puts "=" * 80
-  puts params.inspect
+  # puts "=" * 80
+  # puts params.inspect
   
   # @url = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
   @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
@@ -46,7 +46,11 @@ post '/tf_result' do
     # xml_data = Net::HTTP.get_response(URI.parse("http://localhost:4567/find?url=#{@url}")).body
     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
   elsif @text
-    xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
+    if @text.size < Mongrel::Const::MAX_HEADER
+      xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
+    else
+      puts "Uuuhhhh"
+    end
     # First we find Mus musculus and then we find Volutharpa ampullacea again                                           
     
   end
@@ -83,8 +87,8 @@ post '/submit' do
   # set variabe from params
   set_vars
 
-  puts "=" * 80
-  puts params.inspect.to_s
+  # puts "=" * 80
+  # puts params.inspect.to_s
 
   # @url1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
   # @url2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
@@ -120,35 +124,13 @@ def build_master_lists
   return mfile_names
 end
 
-#  def upload_file(upload)
-#      time_tmp = Time.now.to_f.to_s  
-#      basename = time_tmp+upload[:filename] 
-# +    filename = File.join(@host_sinatra+"/tmp/", basename)
-#      f = File.open(filename, 'wb') 
-#      f.write(upload[:tempfile].read)
-#      f.close
-# -    url = "http://localhost/sinatra/tmp/"+basename
-#      return url
-#  end
- 
 def upload_file(upload)
   time_tmp  = Time.now.to_f.to_s  
-  # tmpfile   = upload[:tempfile]
   filename  = time_tmp+upload[:filename] 
-  tmp_file_name = File.dirname(__FILE__)+'/tmp/'+filename
-  # filename = File.join(@tmp_dir_host, basename)
-  # filename = "/Library/Webserver/Documents/sinatra/tmp/"+time_tmp+basename
-  # filename = "/Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
-  puts "8" * 80
-  print "filename = %s, tmp_file_name = %s\n" % [filename, tmp_file_name]
-  f = File.open(tmp_file_name, 'wb') 
+  f = File.open(File.dirname(__FILE__)+'/tmp/'+filename, 'wb') 
   f.write(upload[:tempfile].read)
   f.close
   url = @tmp_dir_host+filename
-  # url = @tmp_dir_host+time_tmp+basename
-  # url = "file:///Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
-  print "url = %s\n" % url
-  puts "8" * 80
   return url
 end
 
@@ -157,8 +139,6 @@ def set_address
   
   @neti_taxon_finder_web_service_url = @host_name+":4567"
   @reconciliation_web_service_url    = @host_name+":3000"
-  @host_sinatra     = File.dirname(__FILE__)
-  # @host_sinatra     = "/Library/Webserver/Documents/sinatra/"
   @tmp_dir_host     = @host_name+"/sinatra/tmp/"
   @master_lists_dir = @host_name+"/sinatra/master_lists/"
 end
