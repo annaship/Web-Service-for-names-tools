@@ -41,19 +41,27 @@ post '/tf_result' do
   
   @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
 
-  if @url
-    xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
-  elsif @text
-    if @text.size < Mongrel::Const::MAX_HEADER
-      xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
-    else
-      @url = upload_file
-      xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
-    end
+  if @text
+    @text.size < Mongrel::Const::MAX_HEADER ? xml_data = get_xml_data("/find?text=#{@text}") : @url = upload_file
   end
+  
+  if @url
+    xml_data = get_xml_data("/find?url=#{@url}")
+  end
+
+  # if @url
+  #   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
+  # elsif @text
+  #   if @text.size < Mongrel::Const::MAX_HEADER
+  #     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
+  #   else
+  #     @url = upload_file
+  #     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
+  #   end
+  # end
+
   if xml_data
     data = XmlSimple.xml_in(xml_data)
-
     set_result(data)
   end
   erb :tf_result
@@ -166,4 +174,8 @@ def set_result(data)
       @i += 1
     end
   end
+end
+
+def get_xml_data(call)
+  xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
 end
