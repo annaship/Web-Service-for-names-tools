@@ -39,11 +39,9 @@ post '/tf_result' do
   # puts "=" * 80
   # puts params.inspect
   
-  # @url = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
   @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
 
   if @url
-    # xml_data = Net::HTTP.get_response(URI.parse("http://localhost:4567/find?url=#{@url}")).body
     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
   elsif @text
     if @text.size < Mongrel::Const::MAX_HEADER
@@ -52,22 +50,11 @@ post '/tf_result' do
       @url = upload_file
       xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
     end
-    # First we find Mus musculus and then we find Volutharpa ampullacea again                                           
-    
   end
   if xml_data
     data = XmlSimple.xml_in(xml_data)
 
-    @tf_arr = []
-    @i = 0
-    if data["names"][0]["name"]
-      data["names"][0]["name"].each do |item|
-        verbatim = item["verbatim"][0]
-        sciname  = item["scientificName"][0]
-        @tf_arr << [verbatim, sciname]
-        @i += 1
-      end
-    end
+    set_result(data)
   end
   erb :tf_result
 end
@@ -88,15 +75,9 @@ post '/submit' do
   # set variabe from params
   set_vars
 
-  # puts "=" * 80
-  # puts params.inspect.to_s
-
-  # @url1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
-  # @url2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
   @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
   
   if (@url1 && @url2)
-# http://localhost:3000/match?url1=http://localhost/text_bad.txt&url2=http://localhost/text_good.txt !!! rec
     result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?url1=#{@url1}&url2=#{@url2}")
   elsif (@freetext1 && @freetext2)
     result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&text2=#{@freetext2}")
@@ -127,15 +108,15 @@ end
 def upload_file(upload = "")
   time_tmp   = Time.now.to_f.to_s  
   if upload.empty?
-    text     = (URI.unescape @text)
+    # write @text to tmp file
     filename = time_tmp+".tmp"
-    to_read  = text
+    to_file  = URI.unescape @text
   else
     filename = time_tmp+upload[:filename] 
-    to_read  = upload[:tempfile].read
+    to_file  = upload[:tempfile].read
   end
   f = File.open(File.dirname(__FILE__)+'/tmp/'+filename, 'wb') 
-  f.write(to_read)
+  f.write(to_file)
   f.close
   url = @tmp_dir_host+filename
   return url
@@ -174,3 +155,15 @@ def clean_url(url)
   return good_url
 end
 
+def set_result(data)
+  @tf_arr = []
+  @i = 0
+  if data["names"][0]["name"]
+    data["names"][0]["name"].each do |item|
+      verbatim = item["verbatim"][0]
+      sciname  = item["scientificName"][0]
+      @tf_arr << [verbatim, sciname]
+      @i += 1
+    end
+  end
+end
