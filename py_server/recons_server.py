@@ -29,7 +29,7 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
 	            res = "\n".join(arr1)
 	            return res
 
-        print "Connected %s" % conn_name[1]
+        print "Reconciliation: Connected %s" % conn_name[1]
         while 1:
 	            data = self.request.recv(1024)
 	            if len(data) < 1024:
@@ -42,7 +42,7 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
 				# change dummy_comparison with actual reconciliation method
         reconciliation_res = dummy_comparison(text1, text2)
         self.request.send(reconciliation_res)
-        print "Connection %s closed." % conn_name[1]
+        print "Reconciliation: Connection %s closed." % conn_name[1]
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 3002
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # Create the server, binding to localhost on port 1234
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
 
-    print "Server running"
+    print "Reconciliation: Server running"
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()

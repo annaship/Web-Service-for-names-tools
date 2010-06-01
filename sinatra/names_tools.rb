@@ -11,6 +11,7 @@ require 'uri'
 require 'open-uri'
 require 'base64'
 require 'ruby-debug'
+require 'mongrel'
 
 layout 'layout'
 
@@ -119,41 +120,36 @@ def build_master_lists
   return mfile_names
 end
 
+#  def upload_file(upload)
+#      time_tmp = Time.now.to_f.to_s  
+#      basename = time_tmp+upload[:filename] 
+# +    filename = File.join(@host_sinatra+"/tmp/", basename)
+#      f = File.open(filename, 'wb') 
+#      f.write(upload[:tempfile].read)
+#      f.close
+# -    url = "http://localhost/sinatra/tmp/"+basename
+#      return url
+#  end
+ 
 def upload_file(upload)
-  puts upload.pretty_inspect
-  name = upload[:filename]
-  puts "Uploading file, original name #{name.inspect}"
-
-  # write tmpfile on comp
   time_tmp  = Time.now.to_f.to_s  
-
-  tmpfile   = upload[:tempfile]
-  while blk = tmpfile.read(65536)
-    puts "8" * 80
-    # text = blk.inspect
-    text = URI.escape blk
-    # text = URI.unescape(blk)
-    # URI.unescape(url).strip
-    # URI.escape
-    puts text
-  end
-
-    # basename = upload[:filename] 
-    # # filename = File.join(@tmp_dir_host, basename)
-    # # filename = "/Library/Webserver/Documents/sinatra/tmp/"+time_tmp+basename
-    # filename = "/Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
-    # puts "8" * 80
-    # print "filename = %s\n" % filename
-    # f = File.open(filename, 'wb') 
-    # f.write(upload[:tempfile].read)
-    # print "upload[:tempfile] = %s\n" % upload[:tempfile].pretty_inspect
-    # f.close
-    # # url = @tmp_dir_host+basename
-    # # url = @tmp_dir_host+time_tmp+basename
-    # url = "file:///Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
-    # print "url = %s\n" % url
-    # puts "8" * 80
-  return text
+  # tmpfile   = upload[:tempfile]
+  filename  = time_tmp+upload[:filename] 
+  tmp_file_name = File.dirname(__FILE__)+'/tmp/'+filename
+  # filename = File.join(@tmp_dir_host, basename)
+  # filename = "/Library/Webserver/Documents/sinatra/tmp/"+time_tmp+basename
+  # filename = "/Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
+  puts "8" * 80
+  print "filename = %s, tmp_file_name = %s\n" % [filename, tmp_file_name]
+  f = File.open(tmp_file_name, 'wb') 
+  f.write(upload[:tempfile].read)
+  f.close
+  url = @tmp_dir_host+filename
+  # url = @tmp_dir_host+time_tmp+basename
+  # url = "file:///Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/tmp/text_good1.txt"
+  print "url = %s\n" % url
+  puts "8" * 80
+  return url
 end
 
 def set_address
@@ -176,9 +172,9 @@ def set_vars
       end
     end
   end
-  @freetext1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
-  @freetext2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
-  @text  = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
+  @url1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
+  @url2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
+  @url  = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
   
   @url  = clean_url(@url) if @url
   @url1 = clean_url(@url1) if @url1
@@ -189,4 +185,7 @@ def clean_url(url)
   # good_url = URI.escape(URI.unescape(url).strip, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
   good_url = URI.unescape(url).strip
   return good_url
+end
+
+def write_tmp_file
 end
