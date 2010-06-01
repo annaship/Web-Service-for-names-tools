@@ -3,4 +3,6 @@
 .svn
 svn
 RCS
-.log
+*.log
+tmp
+*.tmp

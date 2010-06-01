@@ -49,7 +49,8 @@ post '/tf_result' do
     if @text.size < Mongrel::Const::MAX_HEADER
       xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
     else
-      puts "Uuuhhhh"
+      @url = write_tmp_file
+      xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
     end
     # First we find Mus musculus and then we find Volutharpa ampullacea again                                           
     
@@ -168,4 +169,14 @@ def clean_url(url)
 end
 
 def write_tmp_file
+  text = (URI.unescape @text)
+  # print "text = %s" % text[-20, 20]
+  time_tmp  = Time.now.to_f.to_s  
+  filename  = time_tmp+".tmp"
+  f = File.open(File.dirname(__FILE__)+'/tmp/'+filename, 'wb') 
+  f.write(text)
+  f.close
+  url = @tmp_dir_host+filename
+  # print "url = %s" % url
+  return url
 end
