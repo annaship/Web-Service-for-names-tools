@@ -42,11 +42,11 @@ post '/tf_result' do
   @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
 
   if @text
-    @text.size < Mongrel::Const::MAX_HEADER ? xml_data = get_xml_data("/find?text=#{@text}") : @url = upload_file
+    @text.size < Mongrel::Const::MAX_HEADER ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
   end
   
   if @url
-    xml_data = get_xml_data("/find?url=#{@url}")
+    xml_data = run_neti_service("/find?url=#{@url}")
   end
 
   # if @url
@@ -176,6 +176,6 @@ def set_result(data)
   end
 end
 
-def get_xml_data(call)
+def run_neti_service(call)
   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
 end
