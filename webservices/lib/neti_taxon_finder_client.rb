@@ -64,7 +64,7 @@ class NetiTaxonFinderClient
     # to get offset should we looking for a name in a text anew?
     # TODO: produce rank (see PHP)
     names = []
-    names << output[0].split("\n")
+    names << output[0]
     
     names[0].each do |name|
       name = name.strip

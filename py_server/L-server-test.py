@@ -1,5 +1,6 @@
 import gobject, socket, time
-total_data = []
+# total_data = []
+total_data = ""
 t1 = time.clock()
 from netineti import *
 print "NetiNeti: Initializing... model training..."
@@ -39,26 +40,34 @@ def handler(conn, *args):
 	'''Asynchronous connection handler. Processes each line from the socket.'''
 	global total_data
 	data = conn.recv(1024)
-	print data
+	print '-------------before----------'
+	print "data = %s\n" % data 
+	print "total_data = %s\n" % total_data 
 	# time.sleep(5)
 	if len(data) < 1024:
-		total_data.append(data)
+		# total_data.append(data)
+		total_data = total_data + data
+		print '-------------after + ----------'
+		print total_data
 		conn_name = conn.getpeername()
 		print "NetiNeti: Connection %s closed." % conn_name[1]
-		t_data = ''.join(total_data)
-		total_data = []
+		# t_data = ''.join(total_data)
+		# total_data = []
 		t2 = time.clock()
 		t = t2 - t_connected
 		print t
 		# time.sleep(2)
-		conn.send(nf.find_names(t_data))
+		conn.send(nf.find_names(total_data))
+		# conn.send(nf.find_names(t_data))
 		return False
 	else:
-		total_data.append(data)
+		# total_data.append(data)
+		total_data = total_data + data
 		return True
 		
  
 if __name__=='__main__':
 	server("localhost", 1234)
-	total_data = []
+	total_data = ""
+	# total_data = []
 	gobject.MainLoop().run()
