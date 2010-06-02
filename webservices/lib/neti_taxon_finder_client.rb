@@ -25,24 +25,35 @@ class NetiTaxonFinderClient
     # puts "output = " + data[-100, 100].to_s
     # puts data.class
     names_hash = {}
-    names_arr = []
+    names_arr  = []
 
     # socket ||= TCPSocket.new @host, @port
 
     # socket.write data
-    socket.puts data
-    output = ""
-    while !socket.eof? do
-      output = output + socket.read(1024)
-    end
+    # socket.puts data
+    # output = ""
+    # while !socket.eof? do
+    #   output = output + socket.read(1024)
+    # end
     # puts "output[0..100] = "+output[0..100].inspect.to_s
     # puts "output[-100, 100] = "+output[-100, 100].inspect.to_s
     # puts "output = " + output[0..100].to_s + " ... " + output[-100, 100].to_s
     # puts "output = " + output.to_s
     
+    socket.puts data
+    output = []
+    # puts output
+    while !socket.eof? do
+      output << socket.read(1024)
+    end
+    # puts "output[0..100] = "+output[0..100].inspect.to_s
+    # puts "output[-100, 100] = "+output[-100, 100].inspect.to_s
+    # puts "output = " + output[0..100].to_s + " ... " + output[-100, 100].to_s
+    # puts "output = " + output.pretty_inspect
+    
     socket.close 
     
-    @names = output.gsub("\t","\n") #if output
+    # .gsub("\t","\n") #if output
     # file_outp = open("/Users/anna/work/test_neti_app/test_web_service/out_file_new.txt", 'w')
     # file_outp.print @names.inspect.to_s
     # out_file = open("/Users/anna/work/test_neti_app/res/out_file_"+file_name, "w")                                     
@@ -52,15 +63,16 @@ class NetiTaxonFinderClient
     current_pos = 1
     # to get offset should we looking for a name in a text anew?
     # TODO: produce rank (see PHP)
-    @names.each do |name|
+    names = []
+    names << output[0].split("\n")
+    
+    names[0].each do |name|
       name = name.strip
       current_pos += name.size
       a_name = Name.new(name, "", current_pos) unless name.blank?
       names_arr << a_name
-      #<Name:0x105263a30 @verbatim="Aequipecten", @end_pos=638819, @rank="G", @name="Aequipecten", @start_pos=638809, @scientific="Aequipecten">, 
-      #<Name:0x1052cfb68 @verbatim="Leptopecten latiauratus", @end_pos=638941, @rank="GS", @name="Leptopecten latiauratus", @start_pos=638919, @scientific="Leptopecten latiauratus">, 
-      #<Name:0x1052cbe50 @verbatim="Chlamys hastata hastata", @end_pos=639033, @rank="GSS", @name="Chlamys hastata hastata", @start_pos=639011, @scientific="Chlamys hastata hastata">
     end
+      
     @names = names_arr
     
     return @names
