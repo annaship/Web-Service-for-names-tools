@@ -2,7 +2,7 @@ require 'names_tools'
 require 'spec'
 require 'rack/test'
 require 'ruby-debug'
-require 'mongrel'
+# require 'mongrel'
 
 set :environment, :test
 

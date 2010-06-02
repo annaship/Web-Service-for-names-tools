@@ -1,4 +1,4 @@
-require 'ostruct'
+output = @socket.getsrequire 'ostruct'
 require 'socket'
 require File.dirname(__FILE__) + '/name'
 

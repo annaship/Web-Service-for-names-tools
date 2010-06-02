@@ -11,7 +11,7 @@ require 'uri'
 require 'open-uri'
 require 'base64'
 require 'ruby-debug'
-require 'mongrel'
+# require 'mongrel'
 
 layout 'layout'
 
@@ -35,6 +35,8 @@ post '/tf_result' do
   set_address
   # set variabe from params
   set_vars
+  max_header = 1024 * (80 + 32)
+  # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
   # puts "=" * 80
   # puts params.inspect
@@ -42,7 +44,7 @@ post '/tf_result' do
   @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
 
   if @text
-    @text.size < Mongrel::Const::MAX_HEADER ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
+    @text.size < max_header ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
   end
   
   if @url

@@ -1,10 +1,12 @@
 #! /bin/bash
 
-cd /Users/anna/work/sinatra/Web-Service-for-names-tools/py_server/
-python L-server-test.py &
-python recons_server.py &
-cd /Users/anna/work/sinatra/Web-Service-for-names-tools/webservices/
+tools_dir=/Users/ashipunova/code/web_serv_sci_names/name_tools
+
+cd $tools_dir/py_server/
+python2.6 L-server-test.py &
+python2.6 recons_server.py &
+cd $tools_dir/webservices/
 ruby taxon_finder_web_service.rb &
 ruby reconcile_web_service.rb -p 3000 &
-cd /Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/
+cd $tools_dir/sinatra/
 ruby names_tools.rb -p 3001 &

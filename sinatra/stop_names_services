@@ -1,3 +1,6 @@
 #! /bin/bash
 
+tools_dir=/Users/ashipunova/code/web_serv_sci_names/name_tools
+
 kill_by_name -9 "ruby|python"
+rm $tools_dir/sinatra/tmp/*
