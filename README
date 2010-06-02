@@ -1,37 +1,36 @@
 UI for Neti Neti Taxon Finder and Reconciliation tools
 
-1) run py server for neti tf
-2) run web service for neti tf (will move this one to common file)
-3) run py server for reconciliation
-4) run web service for reconciliation (will move this one to common file)
-5) run ./names_tools.rb -p 3001
+DIRS and FILES:
+1) ./sinatra/tmp - chmod 777
+2) in localhost dir (or any reached via URL) simlink from 
+  a) ./webservices/texts/master_lists
+  b) ./sinatra/tmp
+3) tf py server should be in the same dir as NetiNeti files (or they should be in a PATH)
+copy L-server-test.py, recons_server.py into py_server with all NetiNeti files (from on BoA svn)
 
----------
+RUN:
 Neti Neti TF (server/client - port 1234, service 4567):
-1) run py server for neti tf
-cd /Users/anna/work/web_app/perl_tf/py_server/
-python L-server-test.py 
-
-2) run web service for neti tf (will move this one to common file)
-cd /Users/anna/work/web_app/perl_tf/webservices/ruby/
-ruby taxon_finder_web_service.rb
-----------
 Reconciliation (server/client - port 3002, service 3000):
-3) run py server for reconciliation
-cd /Users/anna/work/sinatra/Web-Service-for-names-tools/py_server/ 
-/py_server 8556$ python recons_server.py
+UI (port 3001) - names_tools.rb
 
-4) run web service for reconciliation (will move this one to common file)
-clear && ruby reconcile_web_service.rb -p 3000 
----------
-5) run ./names_tools.rb -p 3001
-ruby /Users/anna/work/sinatra/Web-Service-for-names-tools/sinatra/names_tools.rb -p 3001
+tools_dir=your_dir_with_servers_web-services_sinatra_app
+
+cd $tools_dir/py_server/
+python L-server-test.py &
+python recons_server.py &
+cd $tools_dir/webservices/
+ruby taxon_finder_web_service.rb &
+ruby reconcile_web_service.rb -p 3000 &
+cd $tools_dir/sinatra/
+ruby names_tools.rb -p 3001 &
+
+
+STOP:
+after killing all 5 processes do:
+rm $tools_dir/sinatra/tmp/*
 
 ==============
 TODO:
-* move reconciliation web service into names_tools.rb
-* move Neti TF web service into names_tools.rb
 * add xml
 * add json
 * def for tf and rec common parts (params?)
-* strip url
