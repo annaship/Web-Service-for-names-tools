@@ -41899,11 +41899,11 @@ describe 'The Neti Neti App' do
     last_response.body.should include("<td>Ahys sandersoni</td>")
   end    
   
-  # it "should take big UTF-8 text and return text" do
-  #   post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@big_text}
-  #   # last_response.should be_ok
-  #   last_response.body.should include("<tr><td>Zirfaea crispata</td><td>Zirfaea crispata</td></tr>")
-  # end    
+  it "should take big UTF-8 text and return text" do
+    post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@big_text}
+    # last_response.should be_ok
+    last_response.body.should include("<tr><td>Zirfaea crispata</td><td>Zirfaea crispata</td></tr>")
+  end    
     
   it "should upload file and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"", "text"=>"", "upload"=>@upload}
