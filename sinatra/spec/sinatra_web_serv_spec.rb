@@ -41879,12 +41879,14 @@ describe 'The Neti Neti App' do
   it "should take url and return text" do
     post "/tf_result", params = {"url"=>@URL, "url_e"=>"none", "text"=>""}
 #    last_response.should be_ok
+    last_response.body.should include("target='new'>http://localhost/text_good1.txt</a>")
     last_response.body.should include("Mus musculus")
   end 
   
   it "should take url with spaces and return text" do
     post "/tf_result", params = {"url"=>@wrongURL1, "url_e"=>"none", "text"=>""}
     last_response.should be_ok
+    last_response.body.should include("target='new'>http://localhost/text_good1.txt   </a>")
     last_response.body.should include("Mus musculus")
   end 
      
@@ -41903,21 +41905,21 @@ describe 'The Neti Neti App' do
   it "should take big UTF-8 text and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@big_text}
     # last_response.should be_ok
+    last_response.body.should include("target='new'>tmp.tmp</a>")
     last_response.body.should include("<tr><td>Zirfaea crispata</td><td>Zirfaea crispata</td></tr>")
   end    
     
   it "should upload file and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"", "text"=>"", "upload"=>@upload}
 #    last_response.should be_ok
+    last_response.body.should include("target='new'>text_good1.txt</a>")
     last_response.body.should include("Mus musculus")
   end    
   
   it "should take example url and return text" do
     # debugger
     post "/tf_result", params = {"url_e"=>@url_e, "url"=>"", "text"=>""}
-    
-    # post "/tf_result", params = {"url"=>"", "url_e"=>"text_good.txt", "text"=>""}
-#    last_response.should be_ok
+    last_response.body.should include("Reading <a href=http://species.asu.edu/2009_species05 target='new'>http://species.asu.edu/2009_species05</a>")
     last_response.body.should include("Selenochlamys ysbryda")
   end    
   
