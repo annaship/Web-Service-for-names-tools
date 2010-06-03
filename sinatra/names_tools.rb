@@ -87,11 +87,11 @@ post '/submit' do
     @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
   
     if (@url1 && @url2)
-      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?url1=#{@url1}&url2=#{@url2}")
+      result = run_rec_service("/match?url1=#{@url1}&url2=#{@url2}")
     elsif (@freetext1 && @freetext2)
-      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&text2=#{@freetext2}")
+      result = run_rec_service("/match?text1=#{@freetext1}&text2=#{@freetext2}")
     elsif (@freetext1 && @url2)
-      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&url2=#{@url2}")
+      result = run_rec_service("/match?text1=#{@freetext1}&url2=#{@url2}")
     end
     possible_names = result.split("\n");
     @arr = []
@@ -161,7 +161,7 @@ def set_vars
 
   @url1 = upload_file(params['upload1']) unless (params['upload1'].nil?)
   @url2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
-  @url  = upload_file(params['upload']) if (params['upload'] && !params['upload'].empty?)
+  @url  = upload_file(params['upload'])  unless (params['upload'].to_s.empty?)
 
   @url  = clean_url(@url) if @url
   @url1 = clean_url(@url1) if @url1
@@ -188,17 +188,10 @@ def set_result(data)
 end
 
 def run_neti_service(call)
-  # begin
-    xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
-    # error do
-    #   'Sorry there was a nasty error - ' + env['sinatra.error'].name
-    # end
-
-  # rescue Errno::EINVAL
-  #   print "Errno::EINVAL"
-  
-  # rescue Exception => err
-  #   render :partial => "broken", :status => 500
-  #   print "err = %s" % err
-  # end
+  xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
 end
+
+def run_rec_service(call)
+  result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
+end
+
