@@ -29,6 +29,7 @@ get '/neti_tf' do
 end
 
 post '/tf_result' do
+  begin
     # set ports and addresses
     set_address
     # set variabe from params
@@ -45,7 +46,6 @@ post '/tf_result' do
       @text.size < max_header ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
     end
   
-    begin
       if @url
         xml_data = run_neti_service("/find?url=#{@url}")
       end
