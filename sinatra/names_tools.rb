@@ -83,22 +83,21 @@ get '/recon' do
 end
 
 post '/submit' do
-  
-  # set ports and addresses
-  set_address
-  # set variabe from params
-  set_vars
+  begin
+    # set ports and addresses
+    set_address
+    # set variabe from params
+    set_vars
 
-  @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
+    @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
   
-  if (@url1 && @url2)
-    result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?url1=#{@url1}&url2=#{@url2}")
-  elsif (@freetext1 && @freetext2)
-    result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&text2=#{@freetext2}")
-  elsif (@freetext1 && @url2)
-    result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&url2=#{@url2}")
-  end
-  if result
+    if (@url1 && @url2)
+      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?url1=#{@url1}&url2=#{@url2}")
+    elsif (@freetext1 && @freetext2)
+      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&text2=#{@freetext2}")
+    elsif (@freetext1 && @url2)
+      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&url2=#{@url2}")
+    end
     possible_names = result.split("\n")
     # (erb :err_message) 
      # : puts "no result!"
@@ -108,7 +107,7 @@ post '/submit' do
       @arr << {name_bad, name_good} 
     end
     erb :rec_result
-  else
+  rescue
     erb :err_message
   end
   # # clean up tmp if exist
