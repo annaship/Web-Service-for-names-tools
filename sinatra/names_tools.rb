@@ -31,42 +31,46 @@ get '/neti_tf' do
 end
 
 post '/tf_result' do
-  # set ports and addresses
-  set_address
-  # set variabe from params
-  set_vars
-  max_header = 1024 * (80 + 32)
-  # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
+  begin 
+    # set ports and addresses
+    set_address
+    # set variabe from params
+    set_vars
+    max_header = 1024 * (80 + 32)
+    # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
-  # puts "=" * 80
-  # puts params.inspect
+    # puts "=" * 80
+    # puts params.inspect
   
-  @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
+    @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
 
-  if @text
-    @text.size < max_header ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
-  end
+    if @text
+      @text.size < max_header ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
+    end
   
-  if @url
-    xml_data = run_neti_service("/find?url=#{@url}")
-  end
+    if @url
+      xml_data = run_neti_service("/find?url=#{@url}")
+    end
 
-  # if @url
-  #   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
-  # elsif @text
-  #   if @text.size < Mongrel::Const::MAX_HEADER
-  #     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
-  #   else
-  #     @url = upload_file
-  #     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
-  #   end
-  # end
+    # if @url
+    #   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
+    # elsif @text
+    #   if @text.size < Mongrel::Const::MAX_HEADER
+    #     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
+    #   else
+    #     @url = upload_file
+    #     xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
+    #   end
+    # end
 
-  if xml_data
-    data = XmlSimple.xml_in(xml_data)
-    set_result(data)
+    if xml_data
+      data = XmlSimple.xml_in(xml_data)
+      set_result(data)
+    end
+    erb :tf_result
+  rescue 
+    erb :err_message
   end
-  erb :tf_result
 end
 
 # -------------
@@ -94,16 +98,21 @@ post '/submit' do
   elsif (@freetext1 && @url2)
     result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&url2=#{@url2}")
   end
-  possible_names = result.split("\n");
-	@arr = []
-	possible_names.each do |names|
-	  name_bad, name_good = names.split(" ---> ")
-    @arr << {name_bad, name_good} 
+  if result
+    possible_names = result.split("\n")
+    # (erb :err_message) 
+     # : puts "no result!"
+  	@arr = [] 
+  	possible_names.each do |names|
+  	  name_bad, name_good = names.split(" ---> ")
+      @arr << {name_bad, name_good} 
+    end
+    erb :rec_result
+  else
+    erb :err_message
   end
-  
   # # clean up tmp if exist
   # `rm #{File.dirname(__FILE__)}/tmp/*`
-  erb :rec_result
 end
 
 def build_master_lists
