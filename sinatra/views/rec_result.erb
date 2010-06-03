@@ -16,16 +16,15 @@
 <p/> Total strings: <%= @rec_num %>
 
 <br />
+<br />
 <table class='nice'>
 	<tr>
 	  <th>Name to compare</th><th></th>
 	  <th>Matched name</th>
 	</tr>   
-	<% @arr.each do |name| 
-		if (name.keys[0] && name.values[0] && !name.keys[0].empty? && !name.keys[0].empty?)	%>
+	<% @arr.each do |name| %>
 		<tr>
 			<td><%= name.keys[0] %></td> <td>---></td> <td><%= name.values[0]%></td>
 		</tr>
-		<% end %>
 	<% end %>
 </table>

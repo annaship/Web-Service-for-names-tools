@@ -19,7 +19,7 @@
 <br/>
 
 <p/> Total strings: <%= @i %>
-<% if @url %>
+<% if @url && @pure_f_name %>
 	<p>Reading <a href=<%= @url %> target='new'><%= @pure_f_name %></a></p>
 <% end %>
 
@@ -29,10 +29,8 @@
     <th>Verbatim String (as appears in text)</th>
     <th>Scientific name</th>
 	</tr> 
-	<% if @tf_arr %>
 		<% @tf_arr.each do |name| %>
 			<tr><td><%= name[0] %></td><td><%= name[1] %></td></tr>
 		<% end %>
-	<% end %>
 </table>
 

@@ -80,7 +80,7 @@ end
 
 post '/submit' do
   begin
-    # set variabe from params
+    # set variables using params
     set_vars
     @rec_num = 0
     
@@ -96,16 +96,16 @@ post '/submit' do
     possible_names = result.split("\n");
     @arr = []
     possible_names.each do |names|
-    name_bad, name_good = names.split(" ---> ")
-      @rec_num += 1
-      @arr << {name_bad, name_good}
+      name_bad, name_good = names.split(" ---> ")
+      # to_s to work with nil and ""
+      unless (name_bad.to_s.empty? || name_good.to_s.empty?)
+        @rec_num += 1 
+        @arr << {name_bad, name_good}
+      end
     end
-  
-    # # clean up tmp if exist
-    # `rm #{File.dirname(__FILE__)}/tmp/*`
     erb :rec_result
   rescue Exception => err
-    print "----- Error in reconciliation: %s -----\n" % err
+    puts "----- Error in reconciliation: %s -----\n" % err
     erb :err_message
   end
 end
@@ -123,7 +123,7 @@ def upload_file(upload = "")
   time_tmp   = Time.now.to_f.to_s
   if upload.empty?
     # write @text to tmp file
-    pure_f_name = "tmp.tmp"
+    pure_f_name = nil
     filename = time_tmp+".tmp"
     to_file  = URI.unescape @text
   else

@@ -41899,13 +41899,14 @@ describe 'The Neti Neti App' do
   it "should take text and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@text}
     # last_response.should be_ok
+    last_response.body.should_not include("Reading")
     last_response.body.should include("<td>Ahys sandersoni</td>")
   end    
   
   it "should take big UTF-8 text and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@big_text}
     # last_response.should be_ok
-    last_response.body.should include("target='new'>tmp.tmp</a>")
+    last_response.body.should_not include("Reading")
     last_response.body.should include("<tr><td>Zirfaea crispata</td><td>Zirfaea crispata</td></tr>")
   end    
     
