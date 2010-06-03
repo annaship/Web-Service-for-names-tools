@@ -18,6 +18,7 @@ describe 'The Neti Neti App' do
     @URL       = "http://localhost/text_good1.txt"
     @wrongURL1 = "http://localhost/text_good1.txt   "
     @wrongURL2 = "http://localhost/text_good1.txt%20%20%20"
+    @not_URL   = "a"
     @text   = URI.escape "Those are good: Atys sajidersoni and Ahys sandersoni. We love them."
     @upload = Rack::Test::UploadedFile.new '/Library/Webserver/Documents/text_good1.txt'
     @url_e  = "http://species.asu.edu/2009_species05"
@@ -41919,6 +41920,13 @@ describe 'The Neti Neti App' do
 #    last_response.should be_ok
     last_response.body.should include("Selenochlamys ysbryda")
   end    
+  
+  it "should return message if URL isn't an URL" do
+    # debugger
+    post "/tf_result", params = {"url_e"=>"", "url"=>@not_URL, "text"=>""}
+#    last_response.should be_ok
+    last_response.body.should include("Sorry, something went wrong, please try again:")
+  end    
 end
 
 
@@ -41930,11 +41938,12 @@ describe 'The Reconcile App' do
   end
 
   before :all do
-    @bad_URL   = "http://localhost/text_bad.txt"
-    @good_URL  = "http://localhost/text_good.txt" 
-    @long_URL  = "http://localhost/pictorialgeo.txt"
+    @bad_URL    = "http://localhost/text_bad.txt"
+    @good_URL   = "http://localhost/text_good.txt" 
+    @long_URL   = "http://localhost/pictorialgeo.txt"
     @wrong_URL1 = "http://localhost/text_bad.txt&url2=http://localhost/text_good.txt%20%20%20"
     @wrong_URL2 = "http://localhost/text_bad.txt&url2=http://localhost/text_good.txt   "
+    @not_url    = "a"
     @text1 = URI.escape "Atys sajidersoni\nAhys sandersoni"
     @text2 = URI.escape "Atys sandersoni"
     @text3 = URI.escape "Atys sajidersoni\n\rAhys sandersoni"
@@ -41999,14 +42008,25 @@ describe 'The Reconcile App' do
 
   it "should take url wth spaces at the end and example url and return text" do
     post "/submit", params = {"url1"=>@wrong_URL2, "url2"=>"", "url_e"=>"text_good.txt", "freetext1"=>"", "freetext2"=>""}
-     last_response.should be_ok
+    last_response.should be_ok
     last_response.body.should include("<td>Ahys sandersoni</td> <td>---></td> <td>Atys sandersoni</td>")
   end    
 
   it "should take url wth %20 at the end and example url and return text" do
     post "/submit", params = {"url1"=>@wrong_URL1, "url2"=>"", "url_e"=>"text_good.txt", "freetext1"=>"", "freetext2"=>""}
-     last_response.should be_ok
+    last_response.should be_ok
     last_response.body.should include("<td>Ahys sandersoni</td> <td>---></td> <td>Atys sandersoni</td>")
   end    
 
+  it "should return err message if only one url was provided" do
+    post "/submit", params = {"url1"=>@bad_URL, "url2"=>"", "url_e"=>"", "freetext1"=>"", "freetext2"=>""}
+    last_response.should be_ok
+    last_response.body.should include("Sorry, something went wrong, please try again:")
+  end    
+
+  it "should return err message if URL isn't an URL" do
+    post "/submit", params = {"url1"=>@bad_URL, "url2"=>@not_URL, "url_e"=>"", "freetext1"=>"", "freetext2"=>""}
+    last_response.should be_ok
+    last_response.body.should include("Sorry, something went wrong, please try again:")
+  end    
 end

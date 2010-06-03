@@ -29,42 +29,51 @@ get '/neti_tf' do
 end
 
 post '/tf_result' do
-  # set ports and addresses
-  set_address
-  # set variabe from params
-  set_vars
-  max_header = 1024 * (80 + 32)
-  # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
+    # set ports and addresses
+    set_address
+    # set variabe from params
+    set_vars
+    max_header = 1024 * (80 + 32)
+    # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
-  # puts "=" * 80
-  # puts params.inspect
+    # puts "=" * 80
+    # puts params.inspect
   
-  @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
+    @url = params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
 
-  if @text
-    @text.size < max_header ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
-  end
+    if @text
+      @text.size < max_header ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
+    end
   
-  if @url
-    xml_data = run_neti_service("/find?url=#{@url}")
-  end
+    begin
+      if @url
+        xml_data = run_neti_service("/find?url=#{@url}")
+      end
+    
+    # if @url
+    # xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
+    # elsif @text
+    # if @text.size < Mongrel::Const::MAX_HEADER
+    # xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
+    # else
+    # @url = upload_file
+    # xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
+    # end
+    # end
 
-  # if @url
-  # xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
-  # elsif @text
-  # if @text.size < Mongrel::Const::MAX_HEADER
-  # xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")
-  # else
-  # @url = upload_file
-  # xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
-  # end
-  # end
-
-  if xml_data
-    data = XmlSimple.xml_in(xml_data)
-    set_result(data)
+    if xml_data
+      data = XmlSimple.xml_in(xml_data)
+      set_result(data)
+    end
+    erb :tf_result
+    # erb :err_message
+  rescue RestClient::InternalServerError 
+    puts "----- Error in NetiNeti: RestClient::InternalServerError -----"
+    erb :err_message
+  rescue RestClient::BadRequest
+    puts "----- Error in NetiNeti: RestClient::BadRequest -----"
+    erb :err_message
   end
-  erb :tf_result
 end
 
 # -------------
@@ -102,7 +111,8 @@ post '/submit' do
     # # clean up tmp if exist
     # `rm #{File.dirname(__FILE__)}/tmp/*`
     erb :rec_result
-  rescue
+  rescue Exception => err
+    print "----- Error in reconciliation: %s -----\n" % err
     erb :err_message
   end
 end
@@ -180,5 +190,17 @@ def set_result(data)
 end
 
 def run_neti_service(call)
-  xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
+  # begin
+    xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
+    # error do
+    #   'Sorry there was a nasty error - ' + env['sinatra.error'].name
+    # end
+
+  # rescue Errno::EINVAL
+  #   print "Errno::EINVAL"
+  
+  # rescue Exception => err
+  #   render :partial => "broken", :status => 500
+  #   print "err = %s" % err
+  # end
 end
