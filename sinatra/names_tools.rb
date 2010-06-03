@@ -64,7 +64,7 @@ post '/tf_result' do
     data = XmlSimple.xml_in(xml_data)
     set_result(data)
   end
-  @tf_arr ? (erb :tf_result) : (erb :err_message)
+  erb :tf_result
 end
 
 # -------------

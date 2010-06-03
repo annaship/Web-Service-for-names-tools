@@ -45,6 +45,7 @@ def handler(conn, *args):
 		t = t2 - t_connected
 		print t
 		conn.send(nf.find_names(total_data))
+		print total_data
 		total_data = ""
 		return False
 	else:
