@@ -82,7 +82,8 @@ post '/submit' do
   begin
     # set variabe from params
     set_vars
-
+    @rec_num = 0
+    
     @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
   
     if (@url1 && @url2)
@@ -96,6 +97,7 @@ post '/submit' do
     @arr = []
     possible_names.each do |names|
     name_bad, name_good = names.split(" ---> ")
+      @rec_num += 1
       @arr << {name_bad, name_good}
     end
   
