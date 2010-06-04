@@ -1,0 +1,53 @@
+<div id="menu">
+
+<ul id="item1">
+<li class="top"><a href='/'>Back to index</a></li>
+<!-- <li class="item"><a href="#">menu item 1</a></li>
+<li class="item"><a href="#">menu item 2</a></li>
+<li class="item"><a href="#">menu item 3</a></li> -->
+</ul>
+
+<ul id="item2">
+<li class="top"><a href='/recon'>Start over</a></li>
+<!-- <li class="item"><a href="#">menu item 1</a></li> -->
+</ul>
+
+</div>
+<div class="clear"></div>
+<!-- menu end -->
+
+<h3>Reconciliation Tool</h3>
+
+<% if @neti_result_fname %>
+<%= @neti_result_fname  %>
+<% else %>
+There's no @neti_result_fname
+<% end %>
+
+<form method="post" action="/submit" enctype="multipart/form-data" >
+	<table class='simple'>
+		<tr>
+			<th></th><th>List to compare</th><th></th><th>Master list</th>
+		</tr>
+		<tr>
+			<td></td><td></td>
+			<td class="label">Master list URLs:</td>
+			<td>
+				<select name="url_e" >
+					<option selected value='none' %> - - Choose an Master list URL - -</option>
+					<% @mfile_names.each do |mfile_name| %>
+						<option class='pretty'> <%= mfile_name %> </option>
+          <% end %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+	    <td class="label">Upload File 1:</td>
+	    <td>http://localhost/sinatra/<%= @neti_result_fname %></td>
+	    <td class="label">Upload file 2:</td>
+	    <td><input type='file' name='upload2' id='my_upload'/></td></tr>
+	</table>
+	<br/>
+	<input type=submit value='Submit'>
+	<input type=hidden name=url1 value="http://localhost/sinatra/#{@neti_result_fname}">
+</form>

@@ -12,12 +12,14 @@ require 'ruby-debug'
 # require 'mongrel'
 
 layout 'layout'
+enable :sessions
 
 ### Public
 
 before do
   # set ports and addresses
   set_address
+  set_vars
 end
 
 get '/' do
@@ -33,7 +35,7 @@ end
 
 post '/tf_result' do
   begin
-    set_vars
+    # set_vars
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
@@ -73,15 +75,22 @@ end
 # Reconciliation
 
 get '/recon' do
-  @mfile_names = []
-  @mfile_names = build_master_lists
   erb :rec_form
 end
 
+get '/call_for_rec' do
+  puts "*" * 80
+  puts params.pretty_inspect
+  @neti_result_fname = session[:neti_result_fname]
+  erb :call_for_rec
+end
+
 post '/submit' do
+  puts "*" * 80
+  puts params.pretty_inspect
   begin
     # set variables using params
-    set_vars
+    # set_vars
     @rec_num = 0
     
     @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
@@ -150,6 +159,9 @@ end
 
 # set variabe from params
 def set_vars
+  @mfile_names = []
+  @mfile_names = build_master_lists
+  
   params.each do |key, value|
     unless key.start_with?('upload')
       unless value.empty?
@@ -175,18 +187,30 @@ def clean_url(url)
 end
 
 def set_result(data)
-  @tf_arr = []
-  @i = 0
+  @tf_arr       = []
+  write_to_file = []
+  @i            = 0
   if data["names"][0]["name"]
     data["names"][0]["name"].each do |item|
-      verbatim = item["verbatim"][0]
-      sciname = item["scientificName"][0]
-      @tf_arr << [verbatim, sciname]
+      verbatim  = item["verbatim"][0]
+      sciname   = item["scientificName"][0]
+      @tf_arr       << [verbatim, sciname]
+      write_to_file << sciname
       @i += 1
     end
+     write_neti_to_file(write_to_file.join("\n"))
   end
 end
 
+def write_neti_to_file(text)
+  time_tmp     = Time.now.to_f.to_s
+  neti_result = File.dirname(__FILE__)+'/tmp/'+time_tmp+"_neti_result.txt"
+  f            = File.open(neti_result, 'wb')
+  f.write(text)
+  f.close
+  session[:neti_result_fname] = neti_result
+end
+  
 # def run_neti_service(call)
 #   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
 # end
