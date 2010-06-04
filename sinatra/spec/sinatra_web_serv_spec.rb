@@ -1,4 +1,5 @@
-require 'names_tools'
+require File.dirname(__FILE__) + '/../names_tools'
+# require 'names_tools'
 require 'spec'
 require 'rack/test'
 require 'ruby-debug'
@@ -41944,8 +41945,8 @@ describe 'The Reconcile App' do
     @bad_URL    = "http://localhost/text_bad.txt"
     @good_URL   = "http://localhost/text_good.txt" 
     @long_URL   = "http://localhost/pictorialgeo.txt"
-    @wrong_URL1 = "http://localhost/text_bad.txt&url2=http://localhost/text_good.txt%20%20%20"
-    @wrong_URL2 = "http://localhost/text_bad.txt&url2=http://localhost/text_good.txt   "
+    @wrong_URL1 = "http://localhost/text_good.txt%20%20%20"
+    @wrong_URL2 = "http://localhost/text_good.txt   "
     @not_url    = "a"
     @text1 = URI.escape "Atys sajidersoni\nAhys sandersoni"
     @text2 = URI.escape "Atys sandersoni"
@@ -42012,13 +42013,13 @@ describe 'The Reconcile App' do
   it "should take url wth spaces at the end and example url and return text" do
     post "/submit", params = {"url1"=>@wrong_URL2, "url2"=>"", "url_e"=>"text_good.txt", "freetext1"=>"", "freetext2"=>""}
     last_response.should be_ok
-    last_response.body.should include("<td>Ahys sandersoni</td> <td>---></td> <td>Atys sandersoni</td>")
+    last_response.body.should include("<td>Abra aequalis</td> <td>---></td> <td>Atys sandersoni</td>")
   end    
 
   it "should take url wth %20 at the end and example url and return text" do
     post "/submit", params = {"url1"=>@wrong_URL1, "url2"=>"", "url_e"=>"text_good.txt", "freetext1"=>"", "freetext2"=>""}
     last_response.should be_ok
-    last_response.body.should include("<td>Ahys sandersoni</td> <td>---></td> <td>Atys sandersoni</td>")
+    last_response.body.should include("<td>Abra aequalis</td> <td>---></td> <td>Atys sandersoni</td>")
   end    
 
   it "should return err message if only one url was provided" do

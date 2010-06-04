@@ -1,1 +1,1 @@
-/Users/anna/work/sinatra/tmp_works/netineti_old.py
+/Users/anna/work/code/sinatra/tmp_works/netineti_old.py

@@ -46,11 +46,11 @@ post '/tf_result' do
     end
 
     if @text
-      @text.size < max_header ? xml_data = run_neti_service("/find?text=#{@text}") : @url = upload_file
+      @text.size < max_header ? (xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")) : @url = upload_file
     end
 
     if @url
-      xml_data = run_neti_service("/find?url=#{@url}")
+      xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
     end
     
     if xml_data
@@ -87,11 +87,11 @@ post '/submit' do
     @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
   
     if (@url1 && @url2)
-      result = run_rec_service("/match?url1=#{@url1}&url2=#{@url2}")
+      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?url1=#{@url1}&url2=#{@url2}")
     elsif (@freetext1 && @freetext2)
-      result = run_rec_service("/match?text1=#{@freetext1}&text2=#{@freetext2}")
+      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&text2=#{@freetext2}")
     elsif (@freetext1 && @url2)
-      result = run_rec_service("/match?text1=#{@freetext1}&url2=#{@url2}")
+      result = RestClient.get URI.encode(@reconciliation_web_service_url+"/match?text1=#{@freetext1}&url2=#{@url2}")
     end
     possible_names = result.split("\n");
     @arr = []
@@ -187,11 +187,11 @@ def set_result(data)
   end
 end
 
-def run_neti_service(call)
-  xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
-end
+# def run_neti_service(call)
+#   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
+# end
 
-def run_rec_service(call)
-  result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
-end
+# def run_rec_service(call)
+#   result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
+# end
 
