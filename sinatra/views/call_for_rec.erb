@@ -18,12 +18,6 @@
 
 <h3>Reconciliation Tool</h3>
 
-<% if @neti_result_fname %>
-<%= @neti_result_fname  %>
-<% else %>
-There's no @neti_result_fname
-<% end %>
-
 <form method="post" action="/submit" enctype="multipart/form-data" >
 	<table class='simple'>
 		<tr>
@@ -43,7 +37,7 @@ There's no @neti_result_fname
 		</tr>
 		<tr>
 	    <td class="label">Upload File 1:</td>
-	    <td>http://localhost/sinatra/<%= @neti_result_fname %></td>
+	    <td id="file_name">NetiNeti taxon finder result</td>
 	    <td class="label">Upload file 2:</td>
 	    <td><input type='file' name='upload2' id='my_upload'/></td></tr>
 	</table>

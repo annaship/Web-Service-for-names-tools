@@ -31,6 +31,11 @@ td.label {
   text-align: right;
   padding-left: 0.4em; }
 
+td#file_name {
+	padding-right: 2em;
+  color: gray; 
+}
+
 option.pretty {
   padding-left: 0.1em; }
 

@@ -79,15 +79,11 @@ get '/recon' do
 end
 
 get '/call_for_rec' do
-  puts "*" * 80
-  puts params.pretty_inspect
   @neti_result_fname = session[:neti_result_fname]
   erb :call_for_rec
 end
 
 post '/submit' do
-  puts "*" * 80
-  puts params.pretty_inspect
   begin
     # set variables using params
     # set_vars
@@ -164,7 +160,7 @@ def set_vars
   
   params.each do |key, value|
     unless key.start_with?('upload')
-      unless value.empty?
+      unless value.to_s.empty?
         instance_variable_set("@#{key}", value)
       end
     end
