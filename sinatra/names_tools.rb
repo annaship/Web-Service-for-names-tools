@@ -22,34 +22,10 @@ $LOAD_PATH.unshift will_paginate_path # using agnostic branch
 require will_paginate_path + '/will_paginate'
 require will_paginate_path + '/will_paginate/view_helpers/link_renderer'
 require will_paginate_path + '/will_paginate/view_helpers/base'
+require will_paginate_path + '/will_paginate/finders/active_record'
+  
 include WillPaginate::ViewHelpers::Base
  
-Array.class_eval do
-  def paginate(opts = {})
-    opts  = {:page => 1, :per_page => 15}.merge(opts)
-    WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
-      pager.replace self[pager.offset, pager.per_page].to_a
-    end
-  end
-end
- 
-WillPaginate::ViewHelpers::LinkRenderer.class_eval do
-  protected
-  def url(page)
-    url = @template.request.url
-    if page == 1
-      # strip out page param and trailing ? if it exists
-      url.gsub(/page=[0-9]+/, '').gsub(/\?$/, '')
-    else
-      if url =~ /page=[0-9]+/
-        url.gsub(/page=[0-9]+/, "page=#{page}")
-      else
-        url + "?page=#{page}"
-      end
-    end
-  end
-end
-
 layout 'layout'
 enable :sessions
 
@@ -72,15 +48,30 @@ get '/neti_tf' do
   erb :tf_form
 end
 
+# get %r{/add?(.+)} do
+#   url = params[:captures]
+#   print "request.url = %s" % request.url.pretty_inspect
+#   # request.url = "http://localhost:3001/add?page=1"
+#   
+#   # add url = ["page=1"]
+#   # add url = ["page=1/uu=123"]
+#   
+# end
+# tf_result?page=2
+
+get '/tf_result' do
+  # @posts = Post.all.paginate
+  debugger
+  @tf_arr_page = session[:tf_arr_page].flatten.to_s.paginate
+  erb :tf_result
+end
+
 post '/tf_result' do
   begin
     # set_vars
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
-    puts "=" * 80
-    puts params.inspect
-    
     if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
       @url         = params['url_e']
       @pure_f_name = params['url_e'] 
@@ -99,6 +90,7 @@ post '/tf_result' do
       set_result(data)
     end
     
+    # request.fullpath+'?page=1'
     erb :tf_result
 
   rescue RestClient::InternalServerError 
@@ -229,17 +221,27 @@ def set_result(data)
     data["names"][0]["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
-      @tf_arr       << [verbatim, sciname]
+      @tf_arr       << [verbatim, sciname].to_s
       write_to_file << sciname
       @i += 1
     end
      write_neti_to_file(write_to_file.join("\n"))
   end
+  
+  # params[:current_page] ||= {:page => 1}
+  
+  # @page_results = @tf_arr.paginate(params[:current_page])
+  # puts "=" * 80
+  puts "=" * 80
+  # puts @page_results.pretty_inspect
   # get 'posts' do
   #   @posts = Post.all.paginate
   # end
   @tf_arr_page = @tf_arr.paginate
-  print "@tf_arr_page = %s" % @tf_arr_page.pretty_inspect
+  print "tf_arr_page = %s, params[:current_page] = " % [@tf_arr_page.pretty_inspect, params[:current_page].pretty_inspect]
+  
+  session[:tf_arr_page] = @tf_arr
+  # print "@tf_arr_page = %s" % @tf_arr_page.pretty_inspect
 end
 
 def write_neti_to_file(text)
@@ -259,12 +261,34 @@ end
 #   result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
 # end
 
-def pagination(skip, limit, total)
-  total_pages = (total + limit - 1) / limit
-
-  links = (1..total_pages).map do |page|
-    %Q|<a href="">#{page}</a>|
+Array.class_eval do
+  def paginate(opts = {})
+    opts  = {:page => 1, :per_page => 2}.merge(opts)
+    WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
+      pager.replace self[pager.offset, pager.per_page].to_a
+    end
   end
-
-  %Q|<div class="pagination">#{links.join}</div>|
 end
+ 
+WillPaginate::ViewHelpers::LinkRenderer.class_eval do
+  protected
+  def url(page)
+    url = @template.request.url
+    puts "-" * 80
+    puts url.pretty_inspect
+    if page == 1
+      puts page.pretty_inspect
+      # strip out page param and trailing ? if it exists
+      url.gsub(/page=[0-9]+/, '').gsub(/\?$/, '')
+    else
+      if url =~ /page=[0-9]+/
+        url.gsub(/page=[0-9]+/, "page=#{page}")
+      else
+        url + "?page=#{page}"
+      end
+    end
+    puts url.pretty_inspect
+  end
+end
+
+# tf_result?page=2

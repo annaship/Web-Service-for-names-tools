@@ -41934,8 +41934,8 @@ describe 'The Neti Neti App' do
   
   
   it "should paginate" do
-    post "/tf_result", params = {"url_e"=>"", "url"=>@longURL, "text"=>""}
-    # post "/tf_result", params = {"url_e"=>"", "url"=>@URL, "text"=>""}
+    # post "/tf_result", params = {"url_e"=>"", "url"=>@longURL, "text"=>""}
+    post "/tf_result", params = {"url_e"=>"", "url"=>@URL, "text"=>""}
     last_response.body.should include('{"total_rows":5,"skip":0,"limit":20,"rows":[]}')
   end   
   
