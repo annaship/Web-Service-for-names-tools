@@ -23,8 +23,10 @@
 	<p>Reading <a href=<%= @url %> target='new'><%= @pure_f_name %></a></p>
 <% end %>
 
+<%= will_paginate @tf_arr_page %>
+
 <br />
-<table class='nice'>
+<!-- <table class='nice'>
 	<tr>
     <th>Verbatim String (as appears in text)</th>
     <th>Scientific name</th>
@@ -32,7 +34,7 @@
 		<% @tf_arr.each do |name| %>
 			<tr><td><%= name[0] %></td><td><%= name[1] %></td></tr>
 		<% end %>
-</table>
+</table> -->
 
 <a href='/call_for_rec'>Reconcile</a>
 

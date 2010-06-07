@@ -9,7 +9,46 @@ require 'uri'
 require 'open-uri'
 require 'base64'
 require 'ruby-debug'
+require 'will_paginate'
 # require 'mongrel'
+
+will_paginate_path = "/Users/anna/work/gems/tmp/will_paginate/lib"
+$LOAD_PATH.unshift will_paginate_path # using agnostic branch
+ 
+# $LOAD_PATH.unshift File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib' # using agnostic branch
+# require File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib/will_paginate'
+# require File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib/will_paginate/view_helpers/link_renderer'
+# require File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib/will_paginate/view_helpers/base'
+require will_paginate_path + '/will_paginate'
+require will_paginate_path + '/will_paginate/view_helpers/link_renderer'
+require will_paginate_path + '/will_paginate/view_helpers/base'
+include WillPaginate::ViewHelpers::Base
+ 
+Array.class_eval do
+  def paginate(opts = {})
+    opts  = {:page => 1, :per_page => 15}.merge(opts)
+    WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
+      pager.replace self[pager.offset, pager.per_page].to_a
+    end
+  end
+end
+ 
+WillPaginate::ViewHelpers::LinkRenderer.class_eval do
+  protected
+  def url(page)
+    url = @template.request.url
+    if page == 1
+      # strip out page param and trailing ? if it exists
+      url.gsub(/page=[0-9]+/, '').gsub(/\?$/, '')
+    else
+      if url =~ /page=[0-9]+/
+        url.gsub(/page=[0-9]+/, "page=#{page}")
+      else
+        url + "?page=#{page}"
+      end
+    end
+  end
+end
 
 layout 'layout'
 enable :sessions
@@ -39,9 +78,9 @@ post '/tf_result' do
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
-    # puts "=" * 80
-    # puts params.inspect
-  
+    puts "=" * 80
+    puts params.inspect
+    
     if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
       @url         = params['url_e']
       @pure_f_name = params['url_e'] 
@@ -196,6 +235,11 @@ def set_result(data)
     end
      write_neti_to_file(write_to_file.join("\n"))
   end
+  # get 'posts' do
+  #   @posts = Post.all.paginate
+  # end
+  @tf_arr_page = @tf_arr.paginate
+  print "@tf_arr_page = %s" % @tf_arr_page.pretty_inspect
 end
 
 def write_neti_to_file(text)
@@ -215,3 +259,12 @@ end
 #   result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
 # end
 
+def pagination(skip, limit, total)
+  total_pages = (total + limit - 1) / limit
+
+  links = (1..total_pages).map do |page|
+    %Q|<a href="">#{page}</a>|
+  end
+
+  %Q|<div class="pagination">#{links.join}</div>|
+end
