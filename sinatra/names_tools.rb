@@ -44,19 +44,24 @@ get '/neti_tf' do
 end
 
 get '/tf_result' do
-  total_pages  = 0
-  per_page     = 30
-  page_number  = params[:page].to_i
-  page_number  = 1 unless page_number >= 1
-  @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
-  page_number  = 1 unless page_number <= @page_res.total_pages 
-  #again, because in first place can't count @page_res.total_pages
-  @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
-  @i           = @page_res.total_entries
-  @url         = $url
-  @pure_f_name = $pure_f_name
+  begin 
+    total_pages  = 0
+    per_page     = 30
+    page_number  = params[:page].to_i
+    page_number  = 1 unless page_number >= 1
+    @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
+    page_number  = 1 unless page_number <= @page_res.total_pages 
+    #again, because in first place we can't count @page_res.total_pages
+    @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
+    @i           = @page_res.total_entries
+    @url         = $url
+    @pure_f_name = $pure_f_name
 
-  erb :tf_result
+    erb :tf_result
+  rescue Exception => err
+    puts "----- Error in NetiNeti (get '/tf_result'): %s -----\n" % err
+    erb :err_message
+  end
 end
 
 post '/tf_result' do

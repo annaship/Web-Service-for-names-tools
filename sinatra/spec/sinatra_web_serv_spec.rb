@@ -42018,10 +42018,7 @@ describe 'The Neti Neti pagination' do
   it "should show first page if page number is bigger then total amount of pages" do
     get "tf_result?page=100"
     last_response.body.should include('<em>1</em>')
-    # last_response.body.should include('<a href="http://example.org/tf_result?page=7">7</a>')
     last_response.body.should include("<a href=\"http://example.org/tf_result?page=7\">7</a>")
-  # <a href=\"http://example.org/tf_result?page=7\">7</a>
-  # <a class=\"next_page\" href=\"http://example.org/tf_result?page=-1?page=2\" rel=\"next\">Next &#8594;</a>
   end
 end
 
