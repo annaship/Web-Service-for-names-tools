@@ -41932,17 +41932,33 @@ describe 'The Neti Neti App' do
     last_response.body.should include("Sorry, something went wrong, please try again:")
   end 
   
+  # pagination
+  
+  # Given 50 names
+  #     Then I should see 20 results
+  #     And 3 pages of results
+  #     And I should not be able to go to a previous page
+  #     When I visit page 3
+  #     Then I should see 10 results
+  #     And I should not be able to go to a next page
+  #     When I visit the previous page
+  #     Then I should see 20 results
+  #     And I should be able to go to a previous page
+  #     When I visit the next page
+  #     Then I should see 10 results
+  #     When I visit page -1
+  #     Then I should see page 1
+  #     When I visit page "foo"
+  #     Then I should see page 1
+  #     When I visit page 4
+  #     Then I should see page 1
   
   it "should paginate" do
     # post "/tf_result", params = {"url_e"=>"", "url"=>@longURL, "text"=>""}
-    post "/tf_result", params = {"url_e"=>"", "url"=>@URL, "text"=>""}
-    last_response.body.should include('{"total_rows":5,"skip":0,"limit":20,"rows":[]}')
+    post "/tf_result", params = {"url_e"=>"@url_e", "url"=>"", "text"=>""}
+    last_response.body.should include('Selenochlamys ysbryda')
+    last_response.body.should include('<span class="previous_page disabled">')
   end   
-  
-  it "should have a link to other pages" do
-    pagination(0, 20, 41).
-      should have_selector("a", :content => "2")
-  end
   
   # it "should paginate" do
   #   RestClient.should_receive(:get).

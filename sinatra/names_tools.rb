@@ -9,23 +9,18 @@ require 'uri'
 require 'open-uri'
 require 'base64'
 require 'ruby-debug'
-require 'will_paginate'
 # require 'mongrel'
 
 will_paginate_path = "/Users/anna/work/gems/tmp/will_paginate/lib"
 $LOAD_PATH.unshift will_paginate_path # using agnostic branch
  
-# $LOAD_PATH.unshift File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib' # using agnostic branch
-# require File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib/will_paginate'
-# require File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib/will_paginate/view_helpers/link_renderer'
-# require File.dirname(__FILE__) + '/vendor/gems/will_paginate/lib/will_paginate/view_helpers/base'
 require will_paginate_path + '/will_paginate'
 require will_paginate_path + '/will_paginate/view_helpers/link_renderer'
 require will_paginate_path + '/will_paginate/view_helpers/base'
 require will_paginate_path + '/will_paginate/finders/active_record'
   
 include WillPaginate::ViewHelpers::Base
- 
+
 layout 'layout'
 enable :sessions
 
@@ -48,21 +43,20 @@ get '/neti_tf' do
   erb :tf_form
 end
 
-# get %r{/add?(.+)} do
-#   url = params[:captures]
-#   print "request.url = %s" % request.url.pretty_inspect
-#   # request.url = "http://localhost:3001/add?page=1"
-#   
-#   # add url = ["page=1"]
-#   # add url = ["page=1/uu=123"]
-#   
-# end
-# tf_result?page=2
-
 get '/tf_result' do
-  # @posts = Post.all.paginate
-  debugger
-  @tf_arr_page = session[:tf_arr_page].flatten.to_s.paginate
+  puts "=" * 80
+  puts params.inspect
+
+  print "session[:page_res] = %s" % session[:page_res].pretty_inspect
+  @page_res = session[:page_res].paginate(:page => params[:page], :per_page => 3)
+  # @posts = Post.paginate :page =&gt; params[:page], :per_page =&gt; 50
+  # print "@page_res = %s" % @page_res.pretty_inspect
+  # arr = ['a', 'b', 'c', 'd', 'e']                                                                         
+    #   paged = arr.paginate(:per_page => 2)      #->  ['a', 'b']                                               
+    #   paged.total_entries                       #->  5                                                        
+    #   arr.paginate(:page => 2, :per_page => 2)  #->  ['c', 'd']                                               
+    #   arr.paginate(:page => 3, :per_page => 2)  #->  ['e']
+  
   erb :tf_result
 end
 
@@ -72,6 +66,9 @@ post '/tf_result' do
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
+    # puts "=" * 80
+    # puts params.inspect
+  
     if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
       @url         = params['url_e']
       @pure_f_name = params['url_e'] 
@@ -89,9 +86,9 @@ post '/tf_result' do
       data = XmlSimple.xml_in(xml_data)
       set_result(data)
     end
-    
-    # request.fullpath+'?page=1'
-    erb :tf_result
+
+    redirect "/tf_result"
+    # erb :tf_result
 
   rescue RestClient::InternalServerError 
     puts "----- Error in NetiNeti: RestClient::InternalServerError -----"
@@ -221,27 +218,13 @@ def set_result(data)
     data["names"][0]["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
-      @tf_arr       << [verbatim, sciname].to_s
+      @tf_arr       << [verbatim, sciname]
       write_to_file << sciname
       @i += 1
     end
      write_neti_to_file(write_to_file.join("\n"))
+     session[:page_res] = write_to_file
   end
-  
-  # params[:current_page] ||= {:page => 1}
-  
-  # @page_results = @tf_arr.paginate(params[:current_page])
-  # puts "=" * 80
-  puts "=" * 80
-  # puts @page_results.pretty_inspect
-  # get 'posts' do
-  #   @posts = Post.all.paginate
-  # end
-  @tf_arr_page = @tf_arr.paginate
-  print "tf_arr_page = %s, params[:current_page] = " % [@tf_arr_page.pretty_inspect, params[:current_page].pretty_inspect]
-  
-  session[:tf_arr_page] = @tf_arr
-  # print "@tf_arr_page = %s" % @tf_arr_page.pretty_inspect
 end
 
 def write_neti_to_file(text)
@@ -261,23 +244,20 @@ end
 #   result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
 # end
 
-Array.class_eval do
-  def paginate(opts = {})
-    opts  = {:page => 1, :per_page => 2}.merge(opts)
-    WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
-      pager.replace self[pager.offset, pager.per_page].to_a
-    end
-  end
-end
+# Array.class_eval do
+#   def paginate(opts = {})
+#     opts  = {:page => 1, :per_page => 3}.merge(opts)
+#     WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
+#       pager.replace self[pager.offset, pager.per_page].to_a
+#     end
+#   end
+# end
  
 WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected
   def url(page)
     url = @template.request.url
-    puts "-" * 80
-    puts url.pretty_inspect
     if page == 1
-      puts page.pretty_inspect
       # strip out page param and trailing ? if it exists
       url.gsub(/page=[0-9]+/, '').gsub(/\?$/, '')
     else
@@ -287,8 +267,5 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
         url + "?page=#{page}"
       end
     end
-    puts url.pretty_inspect
   end
 end
-
-# tf_result?page=2
