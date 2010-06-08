@@ -47,8 +47,7 @@ get '/tf_result' do
   begin 
     total_pages  = 0
     per_page     = 30
-    page_number  = params[:page].to_i
-    page_number  = 1 unless page_number >= 1
+    params[:page].to_i >= 1 ? page_number = params[:page].to_i : page_number = 1
     @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
     page_number  = 1 unless page_number <= @page_res.total_pages 
     #again, because in first place we can't count @page_res.total_pages
