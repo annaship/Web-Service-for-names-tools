@@ -45,16 +45,26 @@ end
 
 get '/tf_result' do
   puts "=" * 80
-  puts params.inspect
+  params[:page] ? page_number = params[:page].to_i : page_number = 1
+  page_number >= 1 ? page_number = page_number : page_number = 1
+  # if @page_res
+  # end
+  puts "=" * 80
+  print "page_number = %s\n" % page_number
+  @page_res    = $tf_result.paginate(:page => page_number, :per_page => 30)
+  @i           = @page_res.total_entries
+  @url         = $url
+  @pure_f_name = $pure_f_name
+  # trace_var :$x, proc{puts "$x is now #{$x}"}
 
-  print "session[:page_res] = %s" % session[:page_res].pretty_inspect
-  @i = session[:page_res].paginate.total_entries
-  @page_res = session[:page_res].paginate(:page => params[:page], :per_page => 3)
-  # TODO:  
-  # 1) take long text (> 4Kb for session, @@?)
-  # 2) nice printing (table)
-  # 3) take array, not single result
-  # 4) total strings should show correct number
+  # print "@page_res = %s\n" % @page_res.pretty_inspect
+  # total_pages  = @page_res.total_pages 
+  # # (params[:page] >= 1 && params[:page] <= total_pages) ? page_number = params[:page] : 1
+  # # params[:page].to_f >= 1 ? page_number = params[:page] : 1
+  # (params[:page] >= 1 && params[:page] <= total_pages) ? page_number = params[:page] : page_number = 1
+  # print "total_pages = %s, params[:page] = %s, page_number = %s\n" % [total_pages.pretty_inspect, params[:page].pretty_inspect, page_number.pretty_inspect]
+
+
   erb :tf_result
 end
 
@@ -83,10 +93,11 @@ post '/tf_result' do
     if xml_data
       data = XmlSimple.xml_in(xml_data)
       set_result(data)
+      $url         = @url
+      $pure_f_name = @pure_f_name
     end
 
     redirect "/tf_result"
-    # erb :tf_result
 
   rescue RestClient::InternalServerError 
     puts "----- Error in NetiNeti: RestClient::InternalServerError -----"
@@ -189,42 +200,24 @@ def set_vars
   @url2 = upload_file(params['upload2']) unless (params['upload2'].nil?)
   @url  = upload_file(params['upload'])  unless (params['upload'].to_s.empty?)
 
-  @url  = clean_url(@url) if @url
+  @url  = clean_url(@url)  if @url
   @url1 = clean_url(@url1) if @url1
   @url2 = clean_url(@url2) if @url2
 end
 
 def set_result(data)
-  @tf_arr       = []
+  $tf_result    = []
   write_to_file = []
   if data["names"][0]["name"]
     data["names"][0]["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
-      @tf_arr       << [verbatim, sciname]
+      $tf_result    << [verbatim, sciname]
       write_to_file << sciname
     end
      write_neti_to_file(write_to_file.join("\n"))
-     session[:page_res] = @tf_arr
   end
 end
-
-# def run_neti_service(call)
-#   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
-# end
-
-# def run_rec_service(call)
-#   result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
-# end
-
-# Array.class_eval do
-#   def paginate(opts = {})
-#     opts  = {:page => 1, :per_page => 3}.merge(opts)
-#     WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
-#       pager.replace self[pager.offset, pager.per_page].to_a
-#     end
-#   end
-# end
 
 private
 
@@ -251,6 +244,23 @@ def clean_url(url)
   good_url = URI.unescape(url).strip
   return good_url
 end
+
+# def run_neti_service(call)
+#   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
+# end
+
+# def run_rec_service(call)
+#   result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
+# end
+
+# Array.class_eval do
+#   def paginate(opts = {})
+#     opts  = {:page => 1, :per_page => 3}.merge(opts)
+#     WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
+#       pager.replace self[pager.offset, pager.per_page].to_a
+#     end
+#   end
+# end
  
 WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected

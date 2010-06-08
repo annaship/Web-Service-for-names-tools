@@ -41879,6 +41879,7 @@ describe 'The Neti Neti App' do
 
   it "should take url and return text" do
     post "/tf_result", params = {"url"=>@URL, "url_e"=>"none", "text"=>""}
+    get "/tf_result"
 #    last_response.should be_ok
     last_response.body.should include("target='new'>http://localhost/text_good1.txt</a>")
     last_response.body.should include("Mus musculus")
@@ -41886,6 +41887,7 @@ describe 'The Neti Neti App' do
   
   it "should take url with spaces and return text" do
     post "/tf_result", params = {"url"=>@wrongURL1, "url_e"=>"none", "text"=>""}
+    get "/tf_result"
     last_response.should be_ok
     last_response.body.should include("target='new'>http://localhost/text_good1.txt   </a>")
     last_response.body.should include("Mus musculus")
@@ -41893,12 +41895,14 @@ describe 'The Neti Neti App' do
      
   it "should take url with %20 and return text" do
     post "/tf_result", params = {"url"=>@wrongURL2, "url_e"=>"none", "text"=>""}
+    get "/tf_result"
     last_response.should be_ok
     last_response.body.should include("Mus musculus")
   end 
   
   it "should take text and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@text}
+    get "/tf_result"
     # last_response.should be_ok
     last_response.body.should_not include("Reading")
     last_response.body.should include("<td>Ahys sandersoni</td>")
@@ -41906,13 +41910,15 @@ describe 'The Neti Neti App' do
   
   it "should take big UTF-8 text and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@big_text}
+    get "/tf_result"
     # last_response.should be_ok
     last_response.body.should_not include("Reading")
-    last_response.body.should include("<tr><td>Zirfaea crispata</td><td>Zirfaea crispata</td></tr>")
+    last_response.body.should include("<td>A. purpurea</td><td>Amaiiropsis purpurea</td>")    
   end    
     
   it "should upload file and return text" do
     post "/tf_result", params = {"url"=>"", "url_e"=>"", "text"=>"", "upload"=>@upload}
+    get "/tf_result"
 #    last_response.should be_ok
     last_response.body.should include("target='new'>text_good1.txt</a>")
     last_response.body.should include("Mus musculus")
@@ -41921,6 +41927,7 @@ describe 'The Neti Neti App' do
   it "should take example url and return text" do
     # debugger
     post "/tf_result", params = {"url_e"=>@url_e, "url"=>"", "text"=>""}
+    get "/tf_result"
     last_response.body.should include("Reading <a href=http://species.asu.edu/2009_species05 target='new'>http://species.asu.edu/2009_species05</a>")
     last_response.body.should include("Selenochlamys ysbryda")
   end    
@@ -41931,21 +41938,36 @@ describe 'The Neti Neti App' do
 #    last_response.should be_ok
     last_response.body.should include("Sorry, something went wrong, please try again:")
   end 
+end
+
+describe 'The Neti Neti pagination' do
+  include Rack::Test::Methods
+
+  def app
+    Sinatra::Application
+  end
+
+  before :all do
+    @URL       = "http://localhost/text_good1.txt"
+    @longURL   = "http://ia341016.us.archive.org/3/items/britishinsectsge00westuoft/britishinsectsge00westuoft_djvu.txt"
+    post "/tf_result", params = {"url"=>@longURL, "url_e"=>"none", "text"=>""}
+  end
   
-  # pagination
-  
-  # Given 50 names
-  #     Then I should see 20 results
-  #     And 3 pages of results
+  # Given 210 names
+  #     Then I should see 30 results
+  #     And 7 pages of results
   #     And I should not be able to go to a previous page
-  #     When I visit page 3
-  #     Then I should see 10 results
+  # ---
+  #     When I visit page 7
+  #     Then I should see 30 results
   #     And I should not be able to go to a next page
+  # ---
   #     When I visit the previous page
-  #     Then I should see 20 results
+  #     Then I should see 30 results
   #     And I should be able to go to a previous page
   #     When I visit the next page
-  #     Then I should see 10 results
+  #     Then I should see 30 results
+  # ---
   #     When I visit page -1
   #     Then I should see page 1
   #     When I visit page "foo"
@@ -41953,12 +41975,54 @@ describe 'The Neti Neti App' do
   #     When I visit page 4
   #     Then I should see page 1
   
-  it "should paginate" do
-    # post "/tf_result", params = {"url_e"=>"", "url"=>@longURL, "text"=>""}
-    post "/tf_result", params = {"url_e"=>"@url_e", "url"=>"", "text"=>""}
-    last_response.body.should include('Selenochlamys ysbryda')
+  it "should show correct first page" do
+    get "/tf_result"
+    # last_response.body.should include("<tr><td>B. rufimanus</td><td>Bruchus rufimanus</td></tr>")    
+    last_response.body.should include("<a href=\"http://example.org/tf_result?page=7\">7</a>")
     last_response.body.should include('<span class="previous_page disabled">')
-  end   
+    last_response.body.should include("<a class=\"next_page\" href=\"http://example.org/tf_result?page=2\" rel=\"next\">Next &#8594;</a>")
+  end    
+  # <em>1</em> <a href=\"http://example.org/tf_result?page=2\" rel=\"next\">2</a>
+  
+  it "should show correct last page" do
+  get "tf_result?page=7"
+  # last_response.body.should include('<tr><td>Xestohium riifovillo-</td><td>Xestohium riifovillo-</td></tr>')
+  last_response.body.should include('<span class="next_page disabled">')
+  last_response.body.should include("<a class=\"previous_page\" href=\"http://example.org/tf_result?page=6\" rel=\"prev\">&#8592; Previous</a>")  
+  end
+
+  it "should show correct middle page" do
+  get "tf_result?page=5"
+  # last_response.body.should include('<tr><td>Osmylus chrysops</td><td>Osmylus chrysops</td></tr>')
+  last_response.body.should include('<em>5</em>')
+  last_response.body.should include("<a class=\"previous_page\" href=\"http://example.org/tf_result?page=4\" rel=\"prev\">&#8592; Previous</a>")  
+  last_response.body.should include("<a class=\"next_page\" href=\"http://example.org/tf_result?page=6\" rel=\"next\">Next &#8594;</a>")
+  end
+
+  it "should show first page if page number is bad" do
+  get "tf_result?page=-1"
+  last_response.body.should include('<em>1</em>')
+  # last_response.body.should include('<a href="http://example.org/tf_result?page=7">7</a>')
+  last_response.body.should include("<a href=\"http://example.org/tf_result?page=-1?page=7\">7</a>")
+# <a href=\"http://example.org/tf_result?page=7\">7</a>
+# <a class=\"next_page\" href=\"http://example.org/tf_result?page=-1?page=2\" rel=\"next\">Next &#8594;</a>
+  end
+
+
+  # TODO:  
+  # 1) take long text - DONE
+  # 2) nice printing (table) - DONE
+  # 3) take array, not single result - DONE
+  # 4) total strings should show correct number - DONE
+
+  
+  # it "should paginate" do
+  #   post "/tf_result", params = {"url_e"=>"", "url"=>@longURL, "text"=>""}
+  #   # post "/tf_result", params = {"url_e"=>"@url_e", "url"=>"", "text"=>""}
+  #   get "/tf_result"
+  #   last_response.body.should include('Selenochlamys ysbryda')
+  #   last_response.body.should include('<span class="previous_page disabled">')
+  # end   
   
   # it "should paginate" do
   #   RestClient.should_receive(:get).
