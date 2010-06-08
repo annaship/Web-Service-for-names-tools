@@ -48,15 +48,13 @@ get '/tf_result' do
   puts params.inspect
 
   print "session[:page_res] = %s" % session[:page_res].pretty_inspect
+  @i = session[:page_res].paginate.total_entries
   @page_res = session[:page_res].paginate(:page => params[:page], :per_page => 3)
-  # @posts = Post.paginate :page =&gt; params[:page], :per_page =&gt; 50
-  # print "@page_res = %s" % @page_res.pretty_inspect
-  # arr = ['a', 'b', 'c', 'd', 'e']                                                                         
-    #   paged = arr.paginate(:per_page => 2)      #->  ['a', 'b']                                               
-    #   paged.total_entries                       #->  5                                                        
-    #   arr.paginate(:page => 2, :per_page => 2)  #->  ['c', 'd']                                               
-    #   arr.paginate(:page => 3, :per_page => 2)  #->  ['e']
-  
+  # TODO:  
+  # 1) take long text (> 4Kb for session, @@?)
+  # 2) nice printing (table)
+  # 3) take array, not single result
+  # 4) total strings should show correct number
   erb :tf_result
 end
 
@@ -108,6 +106,7 @@ end
 
 get '/call_for_rec' do
   @neti_result_fname = session[:neti_result_fname]
+  puts @neti_result_fname
   erb :call_for_rec
 end
 
@@ -141,15 +140,6 @@ post '/submit' do
     puts "----- Error in reconciliation: %s -----\n" % err
     erb :err_message
   end
-end
-
-def build_master_lists
-  mfile_names = []
-  dir_listing = `ls #{File.dirname(__FILE__)}/../webservices/texts/master_lists/*`
-  dir_listing.each do |mfile_name|
-    mfile_names << File.basename(mfile_name)
-  end
-  return mfile_names
 end
 
 def upload_file(upload = "")
@@ -204,38 +194,21 @@ def set_vars
   @url2 = clean_url(@url2) if @url2
 end
 
-def clean_url(url)
-  # good_url = URI.escape(URI.unescape(url).strip, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-  good_url = URI.unescape(url).strip
-  return good_url
-end
-
 def set_result(data)
   @tf_arr       = []
   write_to_file = []
-  @i            = 0
   if data["names"][0]["name"]
     data["names"][0]["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
       @tf_arr       << [verbatim, sciname]
       write_to_file << sciname
-      @i += 1
     end
      write_neti_to_file(write_to_file.join("\n"))
-     session[:page_res] = write_to_file
+     session[:page_res] = @tf_arr
   end
 end
 
-def write_neti_to_file(text)
-  time_tmp     = Time.now.to_f.to_s
-  neti_result = File.dirname(__FILE__)+'/tmp/'+time_tmp+"_neti_result.txt"
-  f            = File.open(neti_result, 'wb')
-  f.write(text)
-  f.close
-  session[:neti_result_fname] = neti_result
-end
-  
 # def run_neti_service(call)
 #   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
 # end
@@ -252,6 +225,32 @@ end
 #     end
 #   end
 # end
+
+private
+
+def build_master_lists
+  mfile_names = []
+  dir_listing = `ls #{File.dirname(__FILE__)}/../webservices/texts/master_lists/*`
+  dir_listing.each do |mfile_name|
+    mfile_names << File.basename(mfile_name)
+  end
+  return mfile_names
+end
+
+def write_neti_to_file(text)
+  time_tmp     = Time.now.to_f.to_s
+  neti_result  = File.dirname(__FILE__)+'/tmp/'+time_tmp+"_neti_result.txt"
+  f            = File.open(neti_result, 'wb')
+  f.write(text)
+  f.close
+  session[:neti_result_fname] = neti_result
+end
+
+def clean_url(url)
+  # good_url = URI.escape(URI.unescape(url).strip, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+  good_url = URI.unescape(url).strip
+  return good_url
+end
  
 WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected
@@ -269,3 +268,4 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
     end
   end
 end
+

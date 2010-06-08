@@ -23,34 +23,38 @@
 	<p>Reading <a href=<%= @url %> target='new'><%= @pure_f_name %></a></p>
 <% end %>
 
-<!-- <br />
+<br />
+<%= will_paginate @page_res %>
+
 <table class='nice'>
 	<tr>
     <th>Verbatim String (as appears in text)</th>
     <th>Scientific name</th>
 	</tr> 
-		<%# @tf_arr.each do |name| %>
-			<tr><td><%#= name[0] %></td><td><%#= name[1] %></td></tr>
-		<%# end %>
+		<% @page_res.each do |name| %>
+			<tr><td><%= name[0] %></td><td><%= name[1] %></td></tr>
+		<% end %>
 </table>
-
-<a href='/call_for_rec'>Reconcile</a> -->
-
-<hr />
-HERE: 
-<%= @page_res.pretty_inspect %>
-<hr />
 
 <%#= will_paginate @page_res %>
 
+<!-- <br /> -->
+<a href='/call_for_rec'>Reconcile</a>
+
+<!-- <hr />
+HERE: 
+<%#= @page_res.pretty_inspect %>
+<hr />
+
+<%##= will_paginate @page_res %>
+
 <ol>
-<% for post in @page_res %>
+<%# for post in @page_res %>
 	<li>
-		There's a <%= post %>
+		There's a <%#= post %>
 	</li>
-<% end %>
+<%# end %>
 </ol>
 
-<p>Now let's render us some pagination!</p>
-<%= will_paginate @page_res %>
+<p>Now let's render us some pagination!</p> -->
 
