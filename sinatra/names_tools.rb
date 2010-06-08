@@ -45,27 +45,16 @@ end
 
 get '/tf_result' do
   total_pages  = 0
-  page_number = params[:page].to_i
-  page_number = 1 unless page_number >= 1
-  # params[:page].to_i >= 1 ? page_number = params[:page].to_i : page_number = 1
-  @page_res    = $tf_result.paginate(:page => page_number, :per_page => 30)
-  if @page_res
-    total_pages  = @page_res.total_pages 
-    page_number  = 1 unless page_number <= total_pages
-    @page_res    = $tf_result.paginate(:page => page_number, :per_page => 30)
-  end
+  per_page     = 30
+  page_number  = params[:page].to_i
+  page_number  = 1 unless page_number >= 1
+  @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
+  page_number  = 1 unless page_number <= @page_res.total_pages 
+  #again, because in first place can't count @page_res.total_pages
+  @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
   @i           = @page_res.total_entries
   @url         = $url
   @pure_f_name = $pure_f_name
-  # trace_var :$x, proc{puts "$x is now #{$x}"}
-
-  # print "@page_res = %s\n" % @page_res.pretty_inspect
-  # total_pages  = @page_res.total_pages 
-  # # (params[:page] >= 1 && params[:page] <= total_pages) ? page_number = params[:page] : 1
-  # # params[:page].to_f >= 1 ? page_number = params[:page] : 1
-  # (params[:page] >= 1 && params[:page] <= total_pages) ? page_number = params[:page] : page_number = 1
-  # print "total_pages = %s, params[:page] = %s, page_number = %s\n" % [total_pages.pretty_inspect, params[:page].pretty_inspect, page_number.pretty_inspect]
-
 
   erb :tf_result
 end
