@@ -44,14 +44,15 @@ get '/neti_tf' do
 end
 
 get '/tf_result' do
-  puts "=" * 80
+  total_pages  = 0
   params[:page] ? page_number = params[:page].to_i : page_number = 1
   page_number >= 1 ? page_number = page_number : page_number = 1
-  # if @page_res
-  # end
-  puts "=" * 80
-  print "page_number = %s\n" % page_number
   @page_res    = $tf_result.paginate(:page => page_number, :per_page => 30)
+  if @page_res
+    total_pages  = @page_res.total_pages 
+    page_number  = 1 unless page_number <= total_pages
+    @page_res    = $tf_result.paginate(:page => page_number, :per_page => 30)
+  end
   @i           = @page_res.total_entries
   @url         = $url
   @pure_f_name = $pure_f_name
