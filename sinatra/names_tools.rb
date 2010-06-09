@@ -55,6 +55,8 @@ get '/tf_result' do
     @i           = @page_res.total_entries
     @url         = $url
     @pure_f_name = $pure_f_name
+    # time_result  = $t1-$t
+    @time_result = sprintf("%5.5f", $t1-$t)
 
     erb :tf_result
   rescue Exception => err
@@ -65,6 +67,7 @@ end
 
 post '/tf_result' do
   begin
+    $t = Time.now.to_f
     # set_vars
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
@@ -90,6 +93,7 @@ post '/tf_result' do
       set_result(data)
       $url         = @url
       $pure_f_name = @pure_f_name
+      $t1 = Time.now.to_f
     end
 
     redirect "/tf_result"
@@ -147,6 +151,8 @@ post '/submit' do
     erb :err_message
   end
 end
+
+# =============
 
 def upload_file(upload = "")
   time_tmp   = Time.now.to_f.to_s
