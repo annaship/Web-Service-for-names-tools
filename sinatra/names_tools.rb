@@ -71,8 +71,8 @@ post '/tf_result' do
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
-    puts "=" * 80
-    puts params.inspect
+    # puts "=" * 80
+    # puts params.inspect
 
     if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
       @url         = params['url_e']
@@ -80,12 +80,13 @@ post '/tf_result' do
     end
 
     if @text
-      print "@text = %s" % @text
-      @text.size < max_header ? (xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")) : @url = upload_file
+      # print "@text = %s\n" % @text
+      @text.size < max_header ? (xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?type=text&input=#{@text}")) : @url = upload_file
     end
 
     if @url
-      xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
+      # print "@url = %s\n" % @url
+      xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?type=url&input=#{@url}")
     end
 
     if xml_data
@@ -114,7 +115,7 @@ end
 
 get '/call_for_rec' do
   @neti_result_fname = session[:neti_result_fname]
-  puts @neti_result_fname
+  # puts @neti_result_fname
   erb :call_for_rec
 end
 
@@ -207,8 +208,9 @@ end
 def set_result(data)
   $tf_result    = []
   write_to_file = []
-  if data["names"][0]["name"]
-    data["names"][0]["name"].each do |item|
+
+  if data["name"]
+    data["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
       $tf_result    << [verbatim, sciname]

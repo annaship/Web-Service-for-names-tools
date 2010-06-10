@@ -20,10 +20,16 @@ set :show_exceptions, false
 get '/' do
   "Taxon Name Finding API, documentation at http://code.google.com/p/taxon-name-processing"
 end
+
 get '/find' do
   # @@client = TaxonFinderClient.new 'localhost' 
   @@client = NetiTaxonFinderClient.new 'localhost' 
   format = @@valid_formats.include?(params[:format]) ? params[:format] : "xml"
+  puts "=" * 80
+  puts params.pretty_inspect
+  
+  handle_semicolon if params[:text]
+  
   begin
     content = params[:text] || params[:url] || params[:encodedtext] || params[:encodedurl]
   rescue
@@ -42,7 +48,6 @@ get '/find' do
     end
     content = pure_text if pure_text
     # use nokogiri only for HTML, because otherwise it stops on OCR errors
-    # content = Nokogiri::HTML(response).content if pure_text.include?("<html>")    
     content = Nokogiri::HTML(response).content if (pure_text && pure_text.include?("<html>"))    
   end
   names = @@client.find(content)
@@ -71,4 +76,15 @@ def to_xml(names)
       end    
     end
   end
+end
+
+def handle_semicolon
+  params_text = params[:text] + ";"
+  params.each_key do |key| 
+    unless ( key == "format" || @@valid_types.include?(key))
+      params_text += key
+    end
+  end
+  puts "params_text = #{params_text}\n"
+  params[:text] = params_text
 end

@@ -7,54 +7,44 @@ require 'uri'
 require 'open-uri'
 require 'base64'
 require 'builder'
-require 'active_support'
-require 'ruby-debug'
+require 'json'
 
 set :show_exceptions, false
 
 # Array of allowed formats
-@@valid_formats = %w[xml json]
-@@valid_types = %w[text url encodedtext encodedurl]
+valid_formats = %w[xml json]
+valid_types = %w[text url encodedtext encodedurl]
 
 #show user an info page if they hit the index
 get '/' do
   "Taxon Name Finding API, documentation at http://code.google.com/p/taxon-name-processing"
 end
 
+"?input={url or text}&type={'url' & ('text')}&encoded={true (false)}&format={xml, json}"
 get '/find' do
-  # @@client = TaxonFinderClient.new 'localhost' 
-  @@client = NetiTaxonFinderClient.new 'localhost' 
-  format = @@valid_formats.include?(params[:format]) ? params[:format] : "xml"
-  puts "=" * 80
-  puts params.pretty_inspect
-  
-  handle_semicolon if params[:text]
-  
-  begin
-    content = params[:text] || params[:url] || params[:encodedtext] || params[:encodedurl]
-  rescue
-    status 400
-  end
-  content = URI.unescape content
-  # decode if it's encoded
-  content = Base64::decode64 content if params[:encodedtext] || params[:encodedurl]
-  # scrape if it's a url
-  if params[:encodedurl] || params[:url]
+  client = NetiTaxonFinderClient.new 'localhost'
+  # default to xml
+  input = URI.unescape(params[:input]) rescue status(400)
+  fmt = params[:format] || 'xml'
+  type = params[:type] || 'text'
+  encoded = params[:encoded] || 'false'
+  input = Base64::decode64(input) if encoded == 'true'
+  if type == 'url'
     begin
-      response = open(content)
-      pure_text = open(content).read
-    rescue
-      status 400
+      response = open(input).read
+      if response.include?('<html>')
+        input = Nokogiri::HTML(response).content
+      else
+        input = response
+      end
+    rescue 
+      status(400)
     end
-    content = pure_text if pure_text
-    # use nokogiri only for HTML, because otherwise it stops on OCR errors
-    content = Nokogiri::HTML(response).content if (pure_text && pure_text.include?("<html>"))    
   end
-  names = @@client.find(content)
-
-  if format == 'json'
+  names = client.find(input)
+  if fmt == 'json'
     content_type 'application/json', :charset => 'utf-8'
-    return Hash.from_xml("#{to_xml(names)}").to_json
+    return to_json(names)
   end
   content_type 'text/xml', :charset => 'utf-8'
   to_xml(names)
@@ -63,28 +53,27 @@ end
 def to_xml(names)
   xml = Builder::XmlMarkup.new
   xml.instruct!
-  xml.response do
-    xml.names("xmlns:dwc" => "http://rs.tdwg.org/dwc/terms/") do
-      names.each do |name|
-        xml.name do
-          xml.verbatim name.verbatim
-          xml.dwc(:scientificName, name.scientific)
-          xml.offsets do
-            xml.offset(:start => name.start_pos, :end => name.end_pos)
-          end
-        end
-      end    
-    end
+  xml.names("xmlns:dwc" => "http://rs.tdwg.org/dwc/terms/") do
+    names.each do |name|
+      xml.name do
+        xml.verbatim name.verbatim
+        xml.dwc(:scientificName, name.scientific)
+        xml.score name.score
+        xml.offset(:start => name.start_pos, :end => name.end_pos)
+      end
+    end    
   end
 end
 
-def handle_semicolon
-  params_text = params[:text] + ";"
-  params.each_key do |key| 
-    unless ( key == "format" || @@valid_types.include?(key))
-      params_text += key
-    end
+def to_json(names)
+  jsonnames = []
+  names.each do |name|
+    jsonnames << {"verbatim" => name.verbatim,
+      "scientificName" => name.scientific,
+      "score" => name.score,
+      "offsetStart" => name.start_pos,
+      "offsetEnd" => name.end_pos
+      }
   end
-  puts "params_text = #{params_text}\n"
-  params[:text] = params_text
+  return JSON.fast_generate({"names" => jsonnames})
 end

@@ -41912,13 +41912,13 @@ describe 'The Neti Neti ' do
       last_response.body.should include("<td>Ahys sandersoni</td>")
     end    
     
-    it "should take text and return text" do
-      post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@bad_text}
-      get "/tf_result"
-      # last_response.should be_ok
-      last_response.body.should_not include("Reading")
-      last_response.body.should include("<td>Ahys sandersoni</td>")
-    end    
+    # it "should take text with a semicolon and return text" do
+    #   post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@bad_text}
+    #   get "/tf_result"
+    #   # last_response.should be_ok
+    #   last_response.body.should_not include("Reading")
+    #   last_response.body.should include("<td>Ahys sandersoni</td>")
+    # end    
   
     it "should take big UTF-8 text and return text" do
       post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>@big_text}
