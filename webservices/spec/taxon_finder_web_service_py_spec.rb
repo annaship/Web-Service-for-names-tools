@@ -18,14 +18,27 @@ FakeWeb.allow_net_connect = false
 
     describe "text tests" do
       before :all do
-        @text     = URI.escape 'first we find Mus musculus and then we find M. musculus again'
-        @text_bad = URI.escape 'first we; find Mus musculus and then we find M. musculus again'
+        @text        = URI.escape 'first we find Mus musculus and then we find M. musculus again'
+        @text_bad    = URI.escape 'first we; find Mus musculus and then we find M. musculus again'
+        @text_bad_wn = URI.escape 'first we find Mus\
+        musculus'
+      end
+
+      it "should return a verbatim name when a valid species name is identified in text with newline" do
+        get "/find?text=#{@text_bad_wn}"
+        last_response.body.should include("Mus musculus")
       end
 
       it "should return a verbatim name when a valid species name is identified in text" do
+        get "/find?text=#{@text}"
+        last_response.body.should include("<verbatim>Mus musculus</verbatim>")
+      end
+      
+      it "should return a verbatim name when a valid species name is identified in text with semicolon" do
         get "/find?text=#{@text_bad}"
         last_response.body.should include("<verbatim>Mus musculus</verbatim>")
       end
+      
       it "should display both sci. name and verbatim when an abbreviated species name is supplied" do
          get "/find?text=#{@text}"
          last_response.body.should include("<verbatim>M. musculus</verbatim>")

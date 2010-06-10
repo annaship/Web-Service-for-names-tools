@@ -26,18 +26,8 @@ get '/find' do
   @@client = NetiTaxonFinderClient.new 'localhost' 
   format = @@valid_formats.include?(params[:format]) ? params[:format] : "xml"
   
-  if params[:text]
-    params_text = ""
-    params.each do |key, value| 
-      if key == "text"
-        params_text += ' '+value
-      else
-        params_text += ' '+key
-      end
-    end
-    params[:text] = params_text
-  end
-
+  handle_semicolon if params[:text]
+  
   begin
     content = params[:text] || params[:url] || params[:encodedtext] || params[:encodedurl]
   rescue
@@ -84,4 +74,14 @@ def to_xml(names)
       end    
     end
   end
+end
+
+def handle_semicolon
+  params_text = params[:text] + ";"
+  params.each_key do |key| 
+    unless (@@valid_formats.include?(key) || @@valid_types.include?(key))
+      params_text += key
+    end
+  end
+  params[:text] = params_text
 end
