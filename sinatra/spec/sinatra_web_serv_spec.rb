@@ -41950,6 +41950,31 @@ describe 'The Neti Neti ' do
   #    last_response.should be_ok
       last_response.body.should include("Sorry, something went wrong, please try again:")
     end 
+    
+#     it "should find a word in a text with dot" do
+#       text = "1.8 mm. in diameter, 3 to 4 whorls, semitranslucent-white to burnt 
+#       sienna. Sculpture of fine, spiral striae and strong, widely spaced, radial ribs. 
+#       Peripheral zone flattened or concave between 2 projecting nodulose keels. 
+#       Under rocks. Moderately common to rare. This genus was formerly placed 
+#       in the family Architectonicidae. \
+# \
+#       Genus Teinostoma H. and A. Adams 1854 "
+#       post "/tf_result", params = {"url_e"=>"", "url"=>"", "text"=>text}
+#       get "/tf_result"
+#       last_response.body.should include("Architectonicidae")
+#     end 
+# 
+#     it "should find a word in a text" do
+#       text = "1.8 mm. in diameter, 3 to 4 whorls, semitranslucent-white to burnt 
+#       sienna. Sculpture of fine, spiral striae and strong, widely spaced, radial ribs. 
+#       Peripheral zone flattened or concave between 2 projecting nodulose keels. 
+#       Under rocks. Moderately common to rare. This genus was formerly placed 
+#       in the family Architectonicidae and Genus Teinostoma H. and A. Adams 1854 "
+#       post "/tf_result", params = {"url_e"=>"", "url"=>"", "text"=>text}
+#       get "/tf_result"
+#       last_response.body.should include("Architectonicidae")
+#     end 
+      
   end
 
 

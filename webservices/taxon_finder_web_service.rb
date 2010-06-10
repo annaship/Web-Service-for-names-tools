@@ -25,6 +25,8 @@ get '/find' do
   # @@client = TaxonFinderClient.new 'localhost' 
   @@client = NetiTaxonFinderClient.new 'localhost' 
   format = @@valid_formats.include?(params[:format]) ? params[:format] : "xml"
+  puts "=" * 80
+  puts params.pretty_inspect
   
   handle_semicolon if params[:text]
   
@@ -79,9 +81,10 @@ end
 def handle_semicolon
   params_text = params[:text] + ";"
   params.each_key do |key| 
-    unless (@@valid_formats.include?(key) || @@valid_types.include?(key))
+    unless ( key == "format" || @@valid_types.include?(key))
       params_text += key
     end
   end
+  puts "params_text = #{params_text}\n"
   params[:text] = params_text
 end
