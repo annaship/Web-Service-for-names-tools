@@ -24,9 +24,10 @@ describe 'The Neti Neti ' do
       @wrongURL2 = "http://localhost/text_good1.txt%20%20%20"
       @longURL   = "http://localhost/Ifamericanseashell.txt"
       @not_URL   = "a"
-      @text   = URI.escape "Those are good: Atys sajidersoni and Ahys sandersoni. We love them."
-      @upload = Rack::Test::UploadedFile.new '/Library/Webserver/Documents/text_good1.txt'
-      @url_e  = "http://species.asu.edu/2009_species05"
+      @text      = URI.escape "Those are good: Atys sajidersoni and Ahys sandersoni. We love them."
+      @bad_text  = URI.escape "Those are good; Atys sajidersoni and Ahys sandersoni. We love them."
+      @upload    = Rack::Test::UploadedFile.new '/Library/Webserver/Documents/text_good1.txt'
+      @url_e     = "http://species.asu.edu/2009_species05"
       @big_text  = URI.escape 'Mrs. Walter E. Garrey 
 
       39 Orchard Avenue 

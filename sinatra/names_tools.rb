@@ -68,26 +68,26 @@ end
 post '/tf_result' do
   begin
     $t = Time.now.to_f
-    # set_vars
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
-    # puts "=" * 80
-    # puts params.inspect
-  
+    puts "=" * 80
+    puts params.inspect
+
     if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
       @url         = params['url_e']
       @pure_f_name = params['url_e'] 
     end
 
     if @text
+      print "@text = %s" % @text
       @text.size < max_header ? (xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?text=#{@text}")) : @url = upload_file
     end
 
     if @url
       xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?url=#{@url}")
     end
-    
+
     if xml_data
       data = XmlSimple.xml_in(xml_data)
       set_result(data)
@@ -98,11 +98,9 @@ post '/tf_result' do
 
     redirect "/tf_result"
 
-  rescue RestClient::InternalServerError 
-    puts "----- Error in NetiNeti: RestClient::InternalServerError -----"
-    erb :err_message
-  rescue RestClient::BadRequest
-    puts "----- Error in NetiNeti: RestClient::BadRequest -----"
+  # rescue RestClient::InternalServerError, RestClient::RequestTimeout, RestClient::BadRequest
+  rescue Exception => err
+    puts "----- Error in NetiNeti (post '/tf_result'): %s -----\n" % err
     erb :err_message
   end
 end
