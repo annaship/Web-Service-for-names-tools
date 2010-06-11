@@ -32,15 +32,12 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
         print "NetiNeti: Connected %s" % conn_name[1]
         while 1:
 	            data = self.request.recv(1024)
-	            # print "NetiNeti: data = %s" % data
 	            if len(data) < 1024:
 	                total_data = total_data + data
 	                break
 	            else:
 	                total_data = total_data + data
 
-        # time.sleep(2)
-        # print "NetiNeti: total_data =  %s" % total_data
         self.request.send(nf.find_names(total_data))
         total_data = ""
         print "NetiNeti: Connection %s closed." % conn_name[1]

@@ -13,7 +13,7 @@ set :show_exceptions, false
 
 # Array of allowed formats
 valid_formats = %w[xml json]
-valid_types = %w[text url encodedtext encodedurl]
+valid_types   = %w[text url encodedtext encodedurl]
 
 #show user an info page if they hit the index
 get '/' do
@@ -23,11 +23,19 @@ end
 "?input={url or text}&type={'url' & ('text')}&encoded={true (false)}&format={xml, json}"
 get '/find' do
   client = NetiTaxonFinderClient.new 'localhost'
-  # default to xml
+  
+  if params[:type] == 'text' && @env["REQUEST_URI"]
+    inp_req = parse_request
+    inp_req = handle_semicolon(inp_req) while (inp_req =~ /;/)
+    params[:input] = inp_req
+  end
+
   input = URI.unescape(params[:input]) rescue status(400)
-  fmt = params[:format] || 'xml'
-  type = params[:type] || 'text'
+  # default to xml
+  fmt     = params[:format] || 'xml'
+  type    = params[:type] || 'text'
   encoded = params[:encoded] || 'false'
+
   input = Base64::decode64(input) if encoded == 'true'
   if type == 'url'
     begin
@@ -77,3 +85,14 @@ def to_json(names)
   end
   return JSON.fast_generate({"names" => jsonnames})
 end
+
+def parse_request
+  input_text = @env["REQUEST_URI"]
+  input = input_text.gsub(/(.*)(input=.*?).(type|encoded|format).*/, '\2')
+  input = input.gsub(/(.*)(input=.*)$/, '\2')
+end
+
+def handle_semicolon(req)
+  req.gsub(/(input=.*?);([^&]*)/, '\1%3D\2')
+end
+
