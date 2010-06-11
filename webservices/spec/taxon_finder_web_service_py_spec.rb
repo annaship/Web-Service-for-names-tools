@@ -24,6 +24,21 @@ describe "Taxon Finder Web Service" do
       musculus'
     end
 
+
+    it 'should get params with semicolon' do
+      url = "/find?type=text&input=#{@text_bad}"
+      env = Rack::MockRequest.env_for(url)
+      req = Rack::Request.new(env)
+      res = URI.unescape @text_bad
+      
+      # req.GET.should == ""
+      # got: {"type"=>"text", "input"=>"This genus was formerly placed \n      in the family Architectonicidae and Genus Teinostoma H. and A. Adams 1854"} (using ==)
+      # req.params.should == ""
+      # got: {"type"=>"text", "input"=>"This genus was formerly placed \n      in the family Architectonicidae and Genus Teinostoma H. and A. Adams 1854"} (using ==)
+      req.params["input"].should == res
+    end
+
+
 #  ------------- text / URL difference -------------
 
     it "should find a word in a text" do

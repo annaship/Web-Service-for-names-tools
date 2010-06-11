@@ -71,21 +71,16 @@ post '/tf_result' do
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
-    # puts "=" * 80
-    # puts params.inspect
-
     if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
       @url         = params['url_e']
       @pure_f_name = params['url_e'] 
     end
 
     if @text
-      # print "@text = %s\n" % @text
       @text.size < max_header ? (xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?type=text&input=#{@text}")) : @url = upload_file
     end
 
     if @url
-      # print "@url = %s\n" % @url
       xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+"/find?type=url&input=#{@url}")
     end
 
@@ -115,14 +110,11 @@ end
 
 get '/call_for_rec' do
   @neti_result_fname = session[:neti_result_fname]
-  # puts @neti_result_fname
   erb :call_for_rec
 end
 
 post '/submit' do
   begin
-    # set variables using params
-    # set_vars
     @rec_num = 0
     
     @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
@@ -246,23 +238,6 @@ def clean_url(url)
   return good_url
 end
 
-# def run_neti_service(call)
-#   xml_data = RestClient.get URI.encode(@neti_taxon_finder_web_service_url+call)
-# end
-
-# def run_rec_service(call)
-#   result = RestClient.get URI.encode(@reconciliation_web_service_url+call)
-# end
-
-# Array.class_eval do
-#   def paginate(opts = {})
-#     opts  = {:page => 1, :per_page => 3}.merge(opts)
-#     WillPaginate::Collection.create(opts[:page], opts[:per_page], size) do |pager|
-#       pager.replace self[pager.offset, pager.per_page].to_a
-#     end
-#   end
-# end
- 
 WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected
   def url(page)
