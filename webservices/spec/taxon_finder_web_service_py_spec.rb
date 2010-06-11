@@ -25,19 +25,12 @@ describe "Taxon Finder Web Service" do
     end
 
 
-    it 'should get params with semicolon' do
+    it 'should parse params with semicolon correct' do
       url = "/find?type=text&input=#{@text_bad}"
       env = Rack::MockRequest.env_for(url)
       req = Rack::Request.new(env)
-      res = URI.unescape @text_bad
-      
-      # req.GET.should == ""
-      # got: {"type"=>"text", "input"=>"This genus was formerly placed \n      in the family Architectonicidae and Genus Teinostoma H. and A. Adams 1854"} (using ==)
-      # req.params.should == ""
-      # got: {"type"=>"text", "input"=>"This genus was formerly placed \n      in the family Architectonicidae and Genus Teinostoma H. and A. Adams 1854"} (using ==)
-      req.params["input"].should == res
+      req.params["input"].should == URI.unescape(@text_bad)
     end
-
 
 #  ------------- text / URL difference -------------
 
