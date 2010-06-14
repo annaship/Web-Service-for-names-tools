@@ -32,8 +32,8 @@ get '/find' do
 
   input = URI.unescape(params[:input]) rescue status(400)
   # default to xml
-  fmt     = params[:format] || 'xml'
-  type    = params[:type] || 'text'
+  fmt     = params[:format]  || 'xml'
+  type    = params[:type]    || 'text'
   encoded = params[:encoded] || 'false'
 
   input = Base64::decode64(input) if encoded == 'true'

@@ -12,6 +12,13 @@ body {
   background: white;
   color: black; }
 
+#footer {
+	position: absolute;
+/*	padding-top: 15px;*/
+	bottom: 0px;
+	width: 100%;
+}
+
 /* form */
 form p label {
   float: left;
