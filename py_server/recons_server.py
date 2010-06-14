@@ -1,6 +1,9 @@
 import SocketServer
 import time
 
+total_data = ""
+
+
 class MyTCPHandler(SocketServer.StreamRequestHandler):
 	#     """
 	#     It is instantiated once per connection to the server, and must
@@ -10,7 +13,7 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
 	
     def handle(self):
         # self.request is the TCP socket connected to the client
-        total_data = []
+        global total_data
         conn = self.request
         conn_name = conn.getpeername()
 
@@ -32,16 +35,20 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
         print "Reconciliation: Connected %s" % conn_name[1]
         while 1:
 	            data = self.request.recv(1024)
+	            print "total_data = %s\n" % total_data
 	            if len(data) < 1024:
-	                total_data.append(data)
-	                break
-	            total_data.append(data)
-        t_data = ''.join(total_data)
-        text1, text2 = t_data.split("&&&EOF&&&")
+	            	total_data = total_data + data
+	            	print "total_data = %s\n" % total_data
+	            	break
+	            else:
+	            	total_data = total_data + data
+
+        text1, text2 = total_data.split("&&&EOF&&&")
         time.sleep(2)
 				# change dummy_comparison with actual reconciliation method
         reconciliation_res = dummy_comparison(text1, text2)
         self.request.send(reconciliation_res)
+        total_data = ""
         print "Reconciliation: Connection %s closed." % conn_name[1]
 
 if __name__ == "__main__":
@@ -49,6 +56,7 @@ if __name__ == "__main__":
 
     # Create the server, binding to localhost on port 1234
     server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
+    total_data = ""
 
     print "Reconciliation: Server running"
     # Activate the server; this will keep running until you

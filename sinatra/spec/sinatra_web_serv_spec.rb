@@ -42021,13 +42021,13 @@ describe 'The Neti Neti ' do
     end    
   
     it "should show correct last page" do
-      get "tf_result?page=14"
-      # get "tf_result?page=7" # for 30 lines pagination
+      # get "tf_result?page=14"
+      get "tf_result?page=7" # for 30 lines pagination
       last_response.should be_ok
       # last_response.body.should include('<tr><td>Xestohium riifovillo-</td><td>Xestohium riifovillo-</td></tr>')
       last_response.body.should include('<span class="next_page disabled">')
-      # last_response.body.should include("href=\"http://example.org/tf_result?page=6\"")  # for 30 lines pagination
-      last_response.body.should include("href=\"http://example.org/tf_result?page=13\"")  
+      last_response.body.should include("href=\"http://example.org/tf_result?page=6\"")  # for 30 lines pagination
+      # last_response.body.should include("href=\"http://example.org/tf_result?page=13\"")  
       last_response.body.should include("&#8592; Previous</a>")  
     end
 
