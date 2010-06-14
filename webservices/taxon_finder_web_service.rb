@@ -27,7 +27,7 @@ get '/find' do
   if params[:type] == 'text' && @env["REQUEST_URI"]
     inp_req = parse_request
     inp_req = handle_semicolon(inp_req) while (inp_req =~ /;/)
-    params[:input] = inp_req
+    params[:input] = inp_req.gsub(/input=/, '')
   end
 
   input = URI.unescape(params[:input]) rescue status(400)
