@@ -35,13 +35,7 @@ end
 
 helpers do
   def partial(page, options={})
-    puts "=" * 80
-    puts "options = "+options.inspect
-    if options[:kind] == "neti_tf"
-      @appl = '/neti_tf'
-    elsif options[:kind] == "recon"
-        @appl = '/recon'
-    end
+    @appl = options[:kind] if options[:kind] 
     erb page, options.merge!(:layout => false)
   end
 end
@@ -51,6 +45,8 @@ get '/' do
 end
 
 post '/contact_us' do
+  puts "URA, " + params.inspect 
+  # URA, {"recaptcha_response_field"=>"to tremont", "recaptcha_challenge_field"=>"02YbXpciJPcgfadUjeYN9VBJNKrW9i1rvIwkSGqstVJMX1f7KE9walBvwiGqjVJ-cEgdztbz9wl9kD9ZgB_SBRqveeAW2dNdrrJCWeCyAfy_ox4IMVKNU8yohqP2mKFtPw5Dl3yUymesTx8PM6fQHJqZyQ-sJNdKp8S84gStJnTxfQNMdkc-OM3kR4xowTLnqLGLJCOlR7HQp11iKlvY0IJ-i6WirlU-WrmlmyD1mblQRNb6JT42BypHVopMNo1QAG5t-GETl2bW1At8UjJvTEBwioXyUB", "email_sender"=>"aaa", "email_message"=>"dddd"}
   
 end
 
