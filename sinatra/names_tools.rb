@@ -35,6 +35,13 @@ end
 
 helpers do
   def partial(page, options={})
+    puts "=" * 80
+    puts "options = "+options.inspect
+    if options[:kind] == "neti_tf"
+      @appl = '/neti_tf'
+    elsif options[:kind] == "recon"
+        @appl = '/recon'
+    end
     erb page, options.merge!(:layout => false)
   end
 end
