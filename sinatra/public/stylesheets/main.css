@@ -12,12 +12,49 @@ body {
   background: white;
   color: black; }
 
+.container {
+  min-width: 950px;
+  width: 80%;
+  margin: 0 auto;
+  overflow: hidden; }
+
+#content {
+  margin-top: 3em;
+  margin-bottom: 4.5em; }
+  #content .copy {
+    width: 60em; }
+
+a {
+  color: #494949;
+  text-decoration: none;
+  border-bottom: 1px dotted #c8c8c8; }
+  a:visited {
+    color: #7c7c7c;
+    border-bottom: none; }
+  a:focus, a:hover {
+    color: #1592ce;
+    border-bottom: 1px solid #1592ce; }
+  a.external_link {
+    padding-right: 13px;
+    background: url(/images/external_link.gif) no-repeat scroll right center; }
+    a.external_link.img_link {
+      padding-right: 0;
+      background: none; }
+
+.highlight {
+  background-color: #ededff;
+  color: #555599; }
+
+.contact_links a {
+  font-size: 1.5em;
+  line-height: 1em;
+  display: inline-block; }
+
 #footer {
-/*	position: absolute;*/
-	padding-top: 1.5em;
-	bottom: 0px;
-	width: 100%;
-}
+  /*	position: absolute; */
+  padding-top: 1.5em;
+  bottom: 0px;
+  width: 100%; }
 
 /* form */
 form p label {
@@ -31,17 +68,15 @@ input[type="submit"] {
   border: 0.1em solid #1e90ff;
   background: #1e90ff;
   color: white; }
-/*GBIF green 46a912 */
 
+/*GBIF green 46a912 */
 td.label {
   float: left;
   text-align: right;
   padding-left: 0.4em; }
-
 td#file_name {
-	padding-right: 2em;
-  color: gray; 
-}
+  padding-right: 2em;
+  color: gray; }
 
 option.pretty {
   padding-left: 0.1em; }
@@ -56,7 +91,6 @@ input#my_upload {
   size: 41em; }
 
 /* form end */
-
 table {
   margin-left: auto;
   margin-right: auto;
@@ -85,7 +119,6 @@ th {
   text-align: center; }
 
 /* @end */
-
 /* menu group */
 #menu {
   position: absolute;
@@ -115,4 +148,119 @@ th {
   clear: both;
   height: 10px; }
 
+/* @group Contact Area */
+#contact_area fieldset legend {
+  display: none; }
+#contact_area label {
+  font-size: 1.1em;
+  line-height: 0.9em; }
+#contact_area .textbox {
+  display: block;
+  border: 2px solid #cccccc;
+  margin-bottom: 1.5em;
+  width: 45em;
+  padding: 0.25em; }
+#contact_area textarea {
+  display: block;
+  border: 2px solid #cccccc;
+  margin-bottom: 1.5em;
+  width: 45em;
+  padding: 0.25em;
+  height: 9em; }
+#contact_area #recaptcha_table {
+  width: 42em; }
+#contact_area .recaptcha {
+  margin-bottom: 1.5em; }
+#contact_area p.flash {
+  font-size: 1.3em;
+  float: left;
+  margin-bottom: 0; }
+#contact_area input.error, #contact_area textarea.error {
+  background: #fae4e4;
+  border-color: #be1111; }
+#contact_area .errors {
+  padding: 0.75em 0.5em;
+  background: #fae4e4;
+  color: #be1111;
+  margin-bottom: 1.5em;
+  font-size: 1.25em;
+  line-height: 0.75em; }
+#contact_area .error {
+  color: #be1111; }
+
+/* @end */
+/* @group Introductory pages */
+.columns {
+  overflow: hidden; }
+
+.col-3 {
+  width: 32%;
+  margin-right: 2%;
+  float: left; }
+  .col-3.last {
+    margin-right: 0; }
+
+.col-4 {
+  width: 23.5%;
+  margin-right: 2%;
+  float: left; }
+  .col-4.last {
+    margin-right: 0; }
+
+.col-6 {
+  width: 66%;
+  margin-right: 2%;
+  float: left; }
+
+#intro_copy {
+  padding-top: 1.5em; }
+
+#contextualized_copy {
+  padding-top: 1.5em;
+  border-top-style: solid;
+  border-top-width: 1px;
+  margin-bottom: 4.5em; }
+  #contextualized_copy h2 {
+    color: black; }
+  #contextualized_copy .screenshot .label {
+    display: block;
+    color: #797979;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 0.75em;
+    letter-spacing: 0.2em; }
+
+.col-4 .screenshot .label {
+  width: 223px; }
+
+.col-3 .screenshot .label {
+  width: 304px; }
+
+#contextualized_copy .screenshot img {
+  border: 3px solid #ababab; }
+
+#journals_index #contextualized_copy {
+  border-top-color: #99d9eb;
+  background: url(/images/journals_home_bg.gif) repeat-x left top; }
+
+#articles_new #contextualized_copy {
+  border-top-color: #a7d77c;
+  background: url(/images/articles_home_bg.gif) repeat-x left top; }
+#articles_new .text_wrapper {
+  overflow: hidden; }
+#articles_new .image_wrapper {
+  clear: left; }
+
+#genes_new #contextualized_copy {
+  border-top-color: #ffe170;
+  background: url(/images/genes_home_bg.gif) repeat-x left top; }
+  #genes_new #contextualized_copy p {
+    margin-bottom: 0; }
+#genes_new .text_wrapper {
+  overflow: hidden; }
+#genes_new .image_wrapper {
+  margin-top: 1.5em;
+  clear: left; }
+
+/* @end */
 /* menu end */
