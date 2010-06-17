@@ -4,6 +4,7 @@ require 'sinatra'
 require 'xmlsimple'
 require 'rest_client'
 require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
+require File.dirname(__FILE__) + '/config'
 require 'nokogiri'
 require 'uri'
 require 'open-uri'
@@ -169,15 +170,6 @@ def upload_file(upload = "")
   return url
 end
 
-def set_address
-  @host_name = "http://localhost"
-  
-  @neti_taxon_finder_web_service_url = @host_name+":4567"
-  @reconciliation_web_service_url = @host_name+":3000"
-  @tmp_dir_host = @host_name+"/sinatra/tmp/"
-  @master_lists_dir = @host_name+"/sinatra/master_lists/"
-end
-
 # set variabe from params
 def set_vars
   @mfile_names = []
@@ -202,18 +194,20 @@ def set_vars
 end
 
 def set_result(data)
-  $tf_result    = []
+  tf_result     = []
   write_to_file = []
 
   if data["name"]
     data["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
-      $tf_result    << [verbatim, sciname]
+      tf_result    << [verbatim, sciname]
       write_to_file << sciname
     end
+     write_to_file = write_to_file.sort.uniq
      write_neti_to_file(write_to_file.join("\n"))
   end
+  $tf_result = tf_result.sort.uniq
 end
 
 private
