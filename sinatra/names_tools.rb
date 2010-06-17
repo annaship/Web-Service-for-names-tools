@@ -33,8 +33,18 @@ before do
   set_vars
 end
 
+helpers do
+  def partial(page, options={})
+    erb page, options.merge!(:layout => false)
+  end
+end
+
 get '/' do
   erb :index
+end
+
+post '/contact_us' do
+  
 end
 
 # NentiNeti Taxon Finder
@@ -205,7 +215,7 @@ def set_result(data)
       write_to_file << sciname
     end
      write_to_file = write_to_file.sort.uniq
-     write_neti_to_file(write_to_file.join("\n"))
+     write_neti_to_file(write_to_file.join("\r\n"))
   end
   $tf_result = tf_result.sort.uniq
 end

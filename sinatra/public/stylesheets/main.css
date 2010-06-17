@@ -14,7 +14,7 @@ body {
 
 .container {
   min-width: 950px;
-  width: 80%;
+  width: 90%;
   margin: 0 auto;
   overflow: hidden; }
 
@@ -90,7 +90,8 @@ textarea#my_textarea {
 input#my_input {
   width: 41em; }
 input#my_upload {
-  size: 41em; }
+  size: 41em; 
+	width: 41em;}
 
 /* form end */
 table {
@@ -160,7 +161,7 @@ th {
   display: block;
   border: 2px solid #cccccc;
   margin-bottom: 1.5em;
-  width: 45em;
+  width: 53.2em;
   padding: 0.25em; }
 #contact_area textarea {
   display: block;
@@ -191,6 +192,7 @@ th {
   color: #be1111; }
 
 /* @end */
+
 /* @group Introductory pages */
 .columns {
   overflow: hidden; }

@@ -41927,7 +41927,7 @@ describe 'The Neti Neti ' do
       # last_response.should be_ok
       last_response.body.should_not include("Reading")
       # last_response.body.should include("<td>A. purpurea</td><td>Amaiiropsis purpurea</td>")    
-      last_response.body.should include("<tr><td>A. scabra</td><td>Acmaea scabra</td>")    
+      last_response.body.should include("<td>A. irradians irradians</td><td>A. irradians irradians</td>")    
     end    
     
     it "should upload file and return text" do
