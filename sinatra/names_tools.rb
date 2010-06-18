@@ -10,6 +10,8 @@ require 'uri'
 require 'open-uri'
 require 'base64'
 require 'ruby-debug'
+require 'pony'
+# require 'recaptcha'
 # require 'mongrel'
 
 will_paginate_path = "/Users/anna/work/gems/tmp/will_paginate/lib"
@@ -44,11 +46,54 @@ get '/' do
   erb :index
 end
 
-post '/contact_us' do
-  puts "URA, " + params.inspect 
-  # URA, {"recaptcha_response_field"=>"to tremont", "recaptcha_challenge_field"=>"02YbXpciJPcgfadUjeYN9VBJNKrW9i1rvIwkSGqstVJMX1f7KE9walBvwiGqjVJ-cEgdztbz9wl9kD9ZgB_SBRqveeAW2dNdrrJCWeCyAfy_ox4IMVKNU8yohqP2mKFtPw5Dl3yUymesTx8PM6fQHJqZyQ-sJNdKp8S84gStJnTxfQNMdkc-OM3kR4xowTLnqLGLJCOlR7HQp11iKlvY0IJ-i6WirlU-WrmlmyD1mblQRNb6JT42BypHVopMNo1QAG5t-GETl2bW1At8UjJvTEBwioXyUB", "email_sender"=>"aaa", "email_message"=>"dddd"}
-  
+get '/contact_us' do
+  erb :contact_us
 end
+
+post '/contact_us' do
+  @sender  = params["email_sender"]
+  @message = params["email_message"]
+  @errors  = {}
+  @errors[:sender]  = ""
+  @errors[:message] = ""
+  @errors[:sender]  = "Please enter a valid e-mail address." if (@sender.to_s.empty? || @sender !~ /(.+)@(.+)\.(.{2,})/)
+  @errors[:message] = "Please enter a message to send." if @message.to_s.empty?
+  Pony.mail :to      => 'ashipunova@.mbl.edu',
+            :from    => @sender,
+            :subject => 'NetiNeti feedback',
+            :body    => @message
+  erb :index
+end
+
+# post '/contact_us' do
+#   puts "URA, " + params.inspect 
+# 
+#   @sender = params["email_sender"]
+#   puts @sender
+#   # @errors[:sender]  = ""
+#   # @errors[:message] = ""
+#   # @errors[:sender]  = "Please enter a valid e-mail address." if (@sender.blank? || @sender !~ /(.+)@(.+)\.(.{3})/)
+#   @message = params["email_message"]
+#   puts @message
+#   # @errors[:message] = "Please enter a message to send." if @message.blank?
+#   # if verify_recaptcha() && @errors.blank?    
+#   #   puts "verify_recaptcha() && @errors.blank?" 
+#   #   Feedback.deliver_contact(@sender, @message)
+#   #   return if request.xhr?
+#   #   flash[:notice] = "Thank you for your feedback"
+#   #   # render :action => "about",  :layout => 'static'
+#   #   session[:recaptcha_error] = nil
+#   # else
+#   #   puts "else"
+#   #   # @errors[:recaptcha] = "Invalid ReCaptcha. Please ensure you enter the text exactly as it appears." if session[:recaptcha_error]
+#   #   # @errors[:general] = "There was a problem with your submission, please check the fields below" if @errors      
+#   #   # flash[:error] = @errors
+#   #   # render :action => "about", :layout => 'static'
+#   # end
+# 
+#   # URA, {"recaptcha_response_field"=>"to tremont", "recaptcha_challenge_field"=>"02YbXpciJPcgfadUjeYN9VBJNKrW9i1rvIwkSGqstVJMX1f7KE9walBvwiGqjVJ-cEgdztbz9wl9kD9ZgB_SBRqveeAW2dNdrrJCWeCyAfy_ox4IMVKNU8yohqP2mKFtPw5Dl3yUymesTx8PM6fQHJqZyQ-sJNdKp8S84gStJnTxfQNMdkc-OM3kR4xowTLnqLGLJCOlR7HQp11iKlvY0IJ-i6WirlU-WrmlmyD1mblQRNb6JT42BypHVopMNo1QAG5t-GETl2bW1At8UjJvTEBwioXyUB", "email_sender"=>"aaa", "email_message"=>"dddd"}
+#   
+# end
 
 # NentiNeti Taxon Finder
 get '/neti_tf' do
@@ -157,10 +202,6 @@ post '/submit' do
   end
 end
 
-get '/contact_us' do
-  erb :contact_us
-end
-
 # =============
 
 def upload_file(upload = "")
@@ -265,4 +306,3 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
     end
   end
 end
-

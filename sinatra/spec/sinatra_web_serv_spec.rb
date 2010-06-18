@@ -7,6 +7,48 @@ require 'ruby-debug'
 
 set :environment, :test
 
+describe 'Contact Us' do
+  include Rack::Test::Methods
+
+  def app
+    Sinatra::Application
+  end
+  
+  before :all do
+    @good_mail = "tetya-loshad@yandex.ru"
+    @bad_mail  = "uuu"
+    @good_body = "Oh, SOS!!!"
+    # post "/tf_result", params = {"url"=>@longURL, "url_e"=>"none", "text"=>""}
+  end
+  
+  it 'should show good form and recaptcha for contact us' do
+    get "/contact_us"
+    last_response.should be_ok
+  end
+  
+  it 'should send email if all right' do
+    post "/contact_us", params = {"email_sender"=>@good_mail, "email_message"=>@good_body}
+  end
+  
+  
+  it 'should rise error if body is empty' do
+    post "/contact_us", params = {"email_sender"=>@good_mail, "email_message"=>""}
+    # @error[:message].should == "Please enter a message to send."
+    
+  end
+  
+  
+  it 'should rise error if mail address is not valid'
+  
+  it 'should rise error if recaptcha is wrong'
+  
+  it 'should send email if recaptcha is good'
+  {"recaptcha_response_field"=>"dd", "recaptcha_challenge_field"=>"02CD1WfAYydUeeJaaW-Iess7bIF2r7bb8VC5_qQwIHzVHLz52eu6UKXa_cB4iY9AkPvj7rNwqHd4Z9N0yKseOLUY_uOSNqT1Exc0-K4_5ayOlzuARCZMAZOFPjaIc7Kk88rt6SgYWKPwmDQrG3i7J1FlxPObABpmGEaXKlT2ArcjhkxNbzlygGjI0twzZZoPqitXL7uXnhJVFzY6ziL8qX0hSuwl1Fu3gwkNN10qOX-el72LAsk3giYfVd-AzZO7HydbhO87Lf-6uz77YsLARsmKcVGS0B", "email_sender"=>"aass", "email_message"=>"ss"}
+  
+  
+  
+end
+
 describe 'The Neti Neti ' do
 
   include Rack::Test::Methods
