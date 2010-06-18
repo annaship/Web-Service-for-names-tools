@@ -11,7 +11,8 @@ require 'open-uri'
 require 'base64'
 require 'ruby-debug'
 require 'pony'
-require 'sinatra/flash'
+require File.dirname(__FILE__) + '/../webservices/lib/app_lib.rb'
+
 # require 'recaptcha'
 # require 'mongrel'
 
@@ -32,6 +33,7 @@ enable :sessions
 
 before do
   # set ports and addresses
+  read_config
   set_address
   set_vars
 end
@@ -47,16 +49,17 @@ get '/' do
   erb :index
 end
 
-get '/blah' do
-  # This message won't be seen until the NEXT Web request that accesses the flash collection
-  @flash = {}
-  @flash[:blah] = "You were feeling blah at #{Time.now}."
+get '/set-flash' do
+  # Set a flash entry
+  flash[:notice] = "Thanks for signing up!"
 
-  # Accessing the flash displays messages set from the LAST request
-  
-  # "Feeling blah again? That's too bad. #{flash[:blah]}"
-  erb :contact_us_flash
+  # Get a flash entry
+  flash[:notice] # => "Thanks for signing up!"
+
+  # Set a flash entry for only the current request
+  flash.now[:notice] = "Thanks for signing up!"
 end
+
 
 get '/contact_us' do
   erb :contact_us
@@ -66,24 +69,20 @@ post '/contact_us' do
   @sender  = params["email_sender"]
   @message = params["email_message"]
   @errors  = {}
-  @flash   = {}
-  @errors[:sender]  = ""
-  @errors[:message] = ""
-  @flash[:send_err] = ""
-  @flash[:mess_err] = ""
+  @contact_us_succ = false
   @errors[:sender]  = "Please enter a valid e-mail address." if (@sender.to_s.empty? || @sender !~ /(.+)@(.+)\.(.{2,})/)
   @errors[:message] = "Please enter a message to send." if @message.to_s.empty?
-  
-  @flash[:send_err] = @errors[:sender]
-  @flash[:mess_err] = @errors[:message]
 
-  unless @errors[:sender].to_s.empty? && @errors[:message].to_s.empty?
+  if @errors[:sender].to_s.empty? && @errors[:message].to_s.empty?
     Pony.mail :to      => 'ashipunova@.mbl.edu',
               :from    => @sender,
               :subject => 'NetiNeti feedback',
               :body    => @message
+    @contact_us_succ = true
+    erb :index
+  else
     erb :contact_us
-    # redirect "/blah"
+    # redirect "/set-flash"
   end
 end
 

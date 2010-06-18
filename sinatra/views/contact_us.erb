@@ -23,13 +23,15 @@
 <h2 id='contact_us'>Contact Us</h2>
 	<div class='flash success'></div>
 	
-	Here
-	<% if @flash %>
-	<%= @flash[:send_err] if @flash[:send_err] %>
-	and there 
-	<%= @flash[:mess_err] if @flash[:mess_err] %>
+	<% if @errors %>
+		<br />
+		<div id='flash_err'>
+		  <%= @errors[:sender] %>
+		<br />
+		  <%= @errors[:message] %>		
+		</div>
+	<br />
 	<% end %>
-
 
 	<form method='post' url='http://ligercat.ubio.org/about'>
 		<fieldset class='message'>

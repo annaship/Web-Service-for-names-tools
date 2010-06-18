@@ -8,6 +8,7 @@ require 'open-uri'
 require 'base64'
 require 'builder'
 require 'json'
+require File.dirname(__FILE__) + '/lib/app_lib.rb'
 
 set :show_exceptions, false
 
@@ -22,7 +23,8 @@ end
 
 "?input={url or text}&type={'url' & ('text')}&encoded={true (false)}&format={xml, json}"
 get '/find' do
-  client = NetiTaxonFinderClient.new 'localhost'
+  read_config
+  client = NetiTaxonFinderClient.new @host
   
   if params[:type] == 'text' && @env["REQUEST_URI"]
     inp_req = parse_request

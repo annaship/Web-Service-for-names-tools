@@ -1,5 +1,5 @@
 def set_address
-  @host_name = "http://localhost"
+  @host_name = "http://"+@host
   
   @neti_taxon_finder_web_service_url = @host_name+":4567"
   @reconciliation_web_service_url = @host_name+":3000"

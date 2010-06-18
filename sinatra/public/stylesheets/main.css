@@ -21,11 +21,9 @@ body {
 #content {
   margin-top: 3em;
   margin-bottom: 4.5em; }
+
 /*  #content .copy {
-    width: 60em; }
-*/
-
-
+ *  width: 60em; } */
 a {
   color: #494949;
   text-decoration: none;
@@ -90,8 +88,8 @@ textarea#my_textarea {
 input#my_input {
   width: 41em; }
 input#my_upload {
-  size: 41em; 
-	width: 41em;}
+  size: 41em;
+  width: 41em; }
 
 /* form end */
 table {
@@ -192,7 +190,6 @@ th {
   color: #be1111; }
 
 /* @end */
-
 /* @group Introductory pages */
 .columns {
   overflow: hidden; }
@@ -267,12 +264,9 @@ th {
   clear: left; }
 
 /* @end */
-
 /* @group Flash errors */
-#flash {background_color: blue;}
-flash.warning {color: red;}
-flash.info {color: yellow;}
+#flash_err {
+	color: red; }
+
 /* @end */
-
-
 /* menu end */

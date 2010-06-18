@@ -1,6 +1,8 @@
 require 'ostruct'
 require 'socket'
 require File.dirname(__FILE__) + '/name'
+require File.dirname(__FILE__) + '/app_lib.rb'
+require 'yaml'
 
 class Object
    def blank?
@@ -9,9 +11,9 @@ class Object
 end
 
 class NetiTaxonFinderClient
-  def initialize(host = 'localhost', port = 1234)
-    @host = host
-    @port = port
+
+  def initialize(host = @host, port = @port)
+    read_config
     socket
   end
   

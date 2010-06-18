@@ -1,9 +1,10 @@
 import gobject, socket, time
+import yaml
 t1 = time.clock()
 from netineti import *
 print "NetiNeti: Initializing... model training..."
-NN = NetiNetiTrain("species_train.txt")
-# NN = NetiNetiTrain()
+# NN = NetiNetiTrain("species_train.txt")
+NN = NetiNetiTrain()
 nf = nameFinder(NN)
 t2 = time.clock()
 t = t2 - t1
@@ -11,6 +12,16 @@ t = t / 60
 print "NetiNeti: ...model ready in %s min." % t
 t2 = 0
 t = 0
+
+def read_config():
+	global host
+	global port
+	f = open('../config.yml')
+	dataMap = yaml.load(f)
+	f.close()
+	host = dataMap['neti_neti_tf']['host']
+	port = dataMap['neti_neti_tf']['port']
+
 
 def server(host, port):
 	'''NetiNeti: Initialize server and start listening.'''
@@ -45,7 +56,6 @@ def handler(conn, *args):
 		t = t2 - t_connected
 		print t
 		conn.send(nf.find_names(total_data))
-		# print total_data
 		total_data = ""
 		return False
 	else:
@@ -54,6 +64,7 @@ def handler(conn, *args):
 		
  
 if __name__=='__main__':
-	server("localhost", 1234)
+	read_config()
+	server(host, port)
 	total_data = ""
 	gobject.MainLoop().run()
