@@ -11,6 +11,7 @@ require 'open-uri'
 require 'base64'
 require 'ruby-debug'
 require 'pony'
+require 'sinatra/flash'
 # require 'recaptcha'
 # require 'mongrel'
 
@@ -46,6 +47,17 @@ get '/' do
   erb :index
 end
 
+get '/blah' do
+  # This message won't be seen until the NEXT Web request that accesses the flash collection
+  @flash = {}
+  @flash[:blah] = "You were feeling blah at #{Time.now}."
+
+  # Accessing the flash displays messages set from the LAST request
+  
+  # "Feeling blah again? That's too bad. #{flash[:blah]}"
+  erb :contact_us_flash
+end
+
 get '/contact_us' do
   erb :contact_us
 end
@@ -54,15 +66,25 @@ post '/contact_us' do
   @sender  = params["email_sender"]
   @message = params["email_message"]
   @errors  = {}
+  @flash   = {}
   @errors[:sender]  = ""
   @errors[:message] = ""
+  @flash[:send_err] = ""
+  @flash[:mess_err] = ""
   @errors[:sender]  = "Please enter a valid e-mail address." if (@sender.to_s.empty? || @sender !~ /(.+)@(.+)\.(.{2,})/)
   @errors[:message] = "Please enter a message to send." if @message.to_s.empty?
-  Pony.mail :to      => 'ashipunova@.mbl.edu',
-            :from    => @sender,
-            :subject => 'NetiNeti feedback',
-            :body    => @message
-  erb :index
+  
+  @flash[:send_err] = @errors[:sender]
+  @flash[:mess_err] = @errors[:message]
+
+  unless @errors[:sender].to_s.empty? && @errors[:message].to_s.empty?
+    Pony.mail :to      => 'ashipunova@.mbl.edu',
+              :from    => @sender,
+              :subject => 'NetiNeti feedback',
+              :body    => @message
+    erb :contact_us
+    # redirect "/blah"
+  end
 end
 
 # post '/contact_us' do

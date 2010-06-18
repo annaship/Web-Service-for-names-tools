@@ -267,4 +267,12 @@ th {
   clear: left; }
 
 /* @end */
+
+/* @group Flash errors */
+#flash {background_color: blue;}
+flash.warning {color: red;}
+flash.info {color: yellow;}
+/* @end */
+
+
 /* menu end */
