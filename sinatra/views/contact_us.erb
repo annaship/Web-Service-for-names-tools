@@ -24,15 +24,11 @@
 	<div class='flash success'></div>
 	
 	<% if @errors %>
-		<br />
-		<div id='flash_err'>
-		  <%= @errors[:sender] %>
-		<br />
-		  <%= @errors[:message] %>		
-		<br />
-		  <%= @errors[:captcha] %>		
-		</div>
-	<br />
+		<% @errors.each do |error| %>
+			<div id='flash_err'>
+			  <%= error[1] %>
+			</div>
+		<% end %>
 	<% end %>
 
 	<form method='post' url='http://ligercat.ubio.org/about'>
