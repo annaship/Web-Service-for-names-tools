@@ -269,4 +269,10 @@ th {
 	color: red; }
 
 /* @end */
+
+#captcha-image
+{
+vertical-align: middle;
+}
+
 /* menu end */

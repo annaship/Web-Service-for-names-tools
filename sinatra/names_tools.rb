@@ -13,10 +13,11 @@ require 'ruby-debug'
 require 'pony'
 require File.dirname(__FILE__) + '/../webservices/lib/app_lib.rb'
 
-# require 'recaptcha'
-# require 'mongrel'
+require 'sinatra/captcha'
 
-will_paginate_path = "/Users/anna/work/gems/tmp/will_paginate/lib"
+
+will_paginate_path = File.dirname(__FILE__) + "/../../../../gems/tmp/will_paginate/lib"
+
 $LOAD_PATH.unshift will_paginate_path # using agnostic branch
  
 require will_paginate_path + '/will_paginate'
@@ -49,31 +50,21 @@ get '/' do
   erb :index
 end
 
-get '/set-flash' do
-  # Set a flash entry
-  flash[:notice] = "Thanks for signing up!"
-
-  # Get a flash entry
-  flash[:notice] # => "Thanks for signing up!"
-
-  # Set a flash entry for only the current request
-  flash.now[:notice] = "Thanks for signing up!"
-end
-
-
 get '/contact_us' do
   erb :contact_us
 end
 
 post '/contact_us' do
+  params[:captcha_answer] ||= ""
   @sender  = params["email_sender"]
   @message = params["email_message"]
   @errors  = {}
-  @contact_us_succ = false
-  @errors[:sender]  = "Please enter a valid e-mail address." if (@sender.to_s.empty? || @sender !~ /(.+)@(.+)\.(.{2,})/)
-  @errors[:message] = "Please enter a message to send." if @message.to_s.empty?
+  @contact_us_succ  = false
+  @errors[:sender]  = "Please enter a valid e-mail address" if (@sender.to_s.empty? || @sender !~ /(.+)@(.+)\.(.{2,})/)
+  @errors[:message] = "Please enter a message to send" if @message.to_s.empty?
+  @errors[:captcha] = "Please enter correct word" unless captcha_pass?
 
-  if @errors[:sender].to_s.empty? && @errors[:message].to_s.empty?
+  if @errors[:sender].to_s.empty? && @errors[:message].to_s.empty? && @errors[:captcha].to_s.empty?
     Pony.mail :to      => 'ashipunova@.mbl.edu',
               :from    => @sender,
               :subject => 'NetiNeti feedback',
@@ -82,7 +73,6 @@ post '/contact_us' do
     erb :index
   else
     erb :contact_us
-    # redirect "/set-flash"
   end
 end
 
