@@ -2,8 +2,8 @@
 
 
 cd ../py_server/
-# python L-server-test.py &
-python neti_s_server.py &
+python L-server-test.py &
+# python neti_s_server.py &
 python recons_server.py &
 cd ../webservices/
 ruby taxon_finder_web_service.rb &

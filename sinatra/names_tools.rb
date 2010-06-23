@@ -65,7 +65,7 @@ post '/contact_us' do
   @errors[:captcha] = "Please enter correct word" unless captcha_pass?
 
   if @errors.all? {|error| error.empty?}
-    Pony.mail :to      => 'ashipunova@.mbl.edu',
+    Pony.mail :to      => 'ashipunova@mbl.edu',
               :from    => @sender,
               :subject => 'NetiNeti feedback',
               :body    => @message

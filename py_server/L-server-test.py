@@ -3,8 +3,8 @@ import yaml
 t1 = time.clock()
 from netineti import *
 print "NetiNeti: Initializing... model training..."
-# NN = NetiNetiTrain("species_train.txt")
-NN = NetiNetiTrain()
+NN = NetiNetiTrain("species_train.txt")
+#NN = NetiNetiTrain()
 nf = nameFinder(NN)
 t2 = time.clock()
 t = t2 - t1
