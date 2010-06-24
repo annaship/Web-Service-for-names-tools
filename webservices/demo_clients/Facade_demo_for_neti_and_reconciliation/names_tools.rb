@@ -3,7 +3,7 @@ require 'rubygems'
 require 'sinatra'
 require 'xmlsimple'
 require 'rest_client'
-require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
+# require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
 require File.dirname(__FILE__) + '/config'
 require 'nokogiri'
 require 'uri'
@@ -11,12 +11,12 @@ require 'open-uri'
 require 'base64'
 require 'ruby-debug'
 require 'pony'
-require File.dirname(__FILE__) + '/../webservices/lib/app_lib.rb'
+require File.dirname(__FILE__) + '/../../ruby/lib/app_lib'
 
 require 'sinatra/captcha'
 
 
-will_paginate_path = File.dirname(__FILE__) + "/../../../../gems/tmp/will_paginate/lib"
+will_paginate_path = File.dirname(__FILE__) + "/tmp/will_paginate/lib"
 
 $LOAD_PATH.unshift will_paginate_path # using agnostic branch
  
@@ -75,36 +75,6 @@ post '/contact_us' do
     erb :contact_us
   end
 end
-
-# post '/contact_us' do
-#   puts "URA, " + params.inspect 
-# 
-#   @sender = params["email_sender"]
-#   puts @sender
-#   # @errors[:sender]  = ""
-#   # @errors[:message] = ""
-#   # @errors[:sender]  = "Please enter a valid e-mail address." if (@sender.blank? || @sender !~ /(.+)@(.+)\.(.{3})/)
-#   @message = params["email_message"]
-#   puts @message
-#   # @errors[:message] = "Please enter a message to send." if @message.blank?
-#   # if verify_recaptcha() && @errors.blank?    
-#   #   puts "verify_recaptcha() && @errors.blank?" 
-#   #   Feedback.deliver_contact(@sender, @message)
-#   #   return if request.xhr?
-#   #   flash[:notice] = "Thank you for your feedback"
-#   #   # render :action => "about",  :layout => 'static'
-#   #   session[:recaptcha_error] = nil
-#   # else
-#   #   puts "else"
-#   #   # @errors[:recaptcha] = "Invalid ReCaptcha. Please ensure you enter the text exactly as it appears." if session[:recaptcha_error]
-#   #   # @errors[:general] = "There was a problem with your submission, please check the fields below" if @errors      
-#   #   # flash[:error] = @errors
-#   #   # render :action => "about", :layout => 'static'
-#   # end
-# 
-#   # URA, {"recaptcha_response_field"=>"to tremont", "recaptcha_challenge_field"=>"02YbXpciJPcgfadUjeYN9VBJNKrW9i1rvIwkSGqstVJMX1f7KE9walBvwiGqjVJ-cEgdztbz9wl9kD9ZgB_SBRqveeAW2dNdrrJCWeCyAfy_ox4IMVKNU8yohqP2mKFtPw5Dl3yUymesTx8PM6fQHJqZyQ-sJNdKp8S84gStJnTxfQNMdkc-OM3kR4xowTLnqLGLJCOlR7HQp11iKlvY0IJ-i6WirlU-WrmlmyD1mblQRNb6JT42BypHVopMNo1QAG5t-GETl2bW1At8UjJvTEBwioXyUB", "email_sender"=>"aaa", "email_message"=>"dddd"}
-#   
-# end
 
 # NentiNeti Taxon Finder
 get '/neti_tf' do
@@ -227,7 +197,7 @@ def upload_file(upload = "")
     filename = time_tmp+upload[:filename]
     to_file  = upload[:tempfile].read
   end
-  f = File.open(File.dirname(__FILE__)+'/tmp/'+filename, 'wb')
+  f = File.open(File.dirname(__FILE__)+'/public/upload/'+filename, 'wb')
   f.write(to_file)
   f.close
   url = @tmp_dir_host + filename
@@ -270,7 +240,7 @@ def set_result(data)
       write_to_file << sciname
     end
      write_to_file = write_to_file.sort.uniq
-     write_neti_to_file(write_to_file.join("\r\n"))
+     write_neti_to_file(write_to_file.join("\n"))
   end
   $tf_result = tf_result.sort.uniq
 end
@@ -279,7 +249,7 @@ private
 
 def build_master_lists
   mfile_names = []
-  dir_listing = `ls #{File.dirname(__FILE__)}/../webservices/texts/master_lists/*`
+  dir_listing = `ls #{File.dirname(__FILE__)}/public/texts/master_lists/*`
   dir_listing.each do |mfile_name|
     mfile_names << File.basename(mfile_name)
   end
@@ -288,7 +258,7 @@ end
 
 def write_neti_to_file(text)
   time_tmp     = Time.now.to_f.to_s
-  neti_result  = File.dirname(__FILE__)+'/tmp/'+time_tmp+"_neti_result.txt"
+  neti_result  = File.dirname(__FILE__)+'/public/upload/'+time_tmp+"_neti_result.txt"
   f            = File.open(neti_result, 'wb')
   f.write(text)
   f.close

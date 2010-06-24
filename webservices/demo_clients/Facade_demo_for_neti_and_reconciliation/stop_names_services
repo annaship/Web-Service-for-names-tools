@@ -1,4 +1,5 @@
 #! /bin/bash
 
 kill_by_name -9 "ruby|python"
-rm ../sinatra/tmp/*
+rm /public/upload/*
+

@@ -42156,7 +42156,7 @@ describe 'The Reconcile App' do
   it "check reconciliation form html" do
     get '/recon'
 #    last_response.should be_ok
-    last_response.body.should include("Nlist2.txt")
+    last_response.body.should include("master_list.txt")
   end
 
   it "should take url and return text" do

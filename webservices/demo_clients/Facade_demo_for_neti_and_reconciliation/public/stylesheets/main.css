@@ -264,9 +264,12 @@ th {
   clear: left; }
 
 /* @end */
-/* @group Flash errors */
+
+/* @group Flash */
 #flash_err {
 	color: red; }
+#flash_message {
+	color: #19ad4c; }
 
 /* @end */
 

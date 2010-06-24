@@ -1,0 +1,16 @@
+#! /bin/bash
+
+
+cd ../../../netineti/
+python neti-server.py &
+cd ../webservices/ruby/
+ruby taxon_finder_web_service.rb &
+
+# reconciliation
+cd ../../reconciliation/py-server/
+python recons_server.py &
+cd ../webservice
+ruby reconcile_web_service.rb -p 3000 &
+
+cd ../../webservices/demo_clients/Facade_demo_for_neti_and_reconciliation/
+ruby names_tools.rb -p 3001 &

@@ -1,33 +1,25 @@
 UI for Neti Neti Taxon Finder and Reconciliation tools
 
 DIRS and FILES:
-1) ./sinatra/tmp - chmod 777
-2) in localhost dir (or any reached via URL) simlink from 
-  a) ./webservices/texts/master_lists
-  b) ./sinatra/tmp
+/Users/anna/work/web_services/under_git/Web-Service-for-names-tools/webservices/demo_clients/Facade_demo_for_neti_and_reconciliation/public/upload
+
+1) /webservices/demo_clients/Facade_demo_for_neti_and_reconciliation/public/upload - chmod 777
+2) in localhost dir (or any reached via URL) symlink to
+	/webservices/demo_clients/Facade_demo_for_neti_and_reconciliation/public
 3) tf py server should be in the same dir as NetiNeti files (or they should be in a PATH)
-copy L-server-test.py, recons_server.py into py_server with all NetiNeti files (from on BoA svn)
 
 RUN:
 Neti Neti TF (server/client - port 1234, service 4567):
 Reconciliation (server/client - port 3002, service 3000):
 UI (port 3001) - names_tools.rb
 
-tools_dir=your_dir_with_servers_web-services_sinatra_app
+tools_dir=your_dir_with_UI
 
-cd $tools_dir/py_server/
-python L-server-test.py &
-python recons_server.py &
-cd $tools_dir/webservices/
-ruby taxon_finder_web_service.rb &
-ruby reconcile_web_service.rb -p 3000 &
-cd $tools_dir/sinatra/
-ruby names_tools.rb -p 3001 &
-
+see 
 
 STOP:
 after killing all 5 processes do:
-rm $tools_dir/sinatra/tmp/*
+rm $tools_dir/public/upload/*
 
 ==============
 TODO:
