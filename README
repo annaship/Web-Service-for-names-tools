@@ -1,7 +1,10 @@
 UI for Neti Neti Taxon Finder and Reconciliation tools
 
 DIRS and FILES:
-/Users/anna/work/web_services/under_git/Web-Service-for-names-tools/webservices/demo_clients/Facade_demo_for_neti_and_reconciliation/public/upload
+netineti 	            - NetiNeti taxon finder + py server
+reconciliation          - server + client + web service for reconciliation 
+webservices/ruby        - client + web service for NetiNeti taxon finder
+webservices/demo client - UI for both services
 
 1) /webservices/demo_clients/Facade_demo_for_neti_and_reconciliation/public/upload - chmod 777
 2) in localhost dir (or any reached via URL) symlink to
@@ -15,7 +18,7 @@ UI (port 3001) - names_tools.rb
 
 tools_dir=your_dir_with_UI
 
-see 
+see run_names_services
 
 STOP:
 after killing all 5 processes do:
