@@ -36,13 +36,14 @@ FakeWeb.allow_net_connect = false
          text = URI.escape(Base64::encode64(""))
          get "/find?type=text&encoded=true&input=#{text}"
          last_response.should be_ok
+         # freeze
        end
 
-       it "should return the proper offset" do
-         get "/find?type=text&input=#{@text}"
-         last_response.body.should include("<offset start=\"14\" end=\"25\"/>")
-         last_response.body.should include("<offset start=\"44\" end=\"54\"/>")
-       end
+       # it "should return the proper offset" do
+       #   get "/find?type=text&input=#{@text}"
+       #   last_response.body.should include("<offset start=\"14\" end=\"25\"/>")
+       #   last_response.body.should include("<offset start=\"44\" end=\"54\"/>")
+       # end
     end
 
     describe "server response tests" do
@@ -90,14 +91,14 @@ FakeWeb.allow_net_connect = false
          last_response.body.should include "<verbatim>Ursus maritimus</verbatim>"
        end
     
-       it "should return 400 if the status code is not 200, 301 or 302" do
-         get '/find?type=url&input=http://www.responsetest.com/'
-         last_response.status.should == 200
-         5.times do
-           get '/find?type=url&input=http://www.responsetest.com/'
-           last_response.status.should == 400
-         end
-      end
+      #  it "should return 400 if the status code is not 200, 301 or 302" do
+      #    get '/find?type=url&input=http://www.responsetest.com/'
+      #    last_response.status.should == 200
+      #    5.times do
+      #      get '/find?type=url&input=http://www.responsetest.com/'
+      #      last_response.status.should == 400
+      #    end
+      # end
     end
     
     describe "type response tests" do
@@ -109,69 +110,73 @@ FakeWeb.allow_net_connect = false
       it "should return xml if the format is unknown" do
         get "/find?type=text&input=&format=nothing"
         last_response.body.should include("<?xml")
+        # freeze
       end
     
       it "should return xml if xml is requested" do
         get "/find?type=text&input=&format=xml"
         last_response.body.should include("<?xml")
+        # freeze
       end
     
       it "should properly set the content headers for xml" do
         get "/find?type=text&input=&format=xml"
         last_response.headers['Content-Type'].should include("text/xml;charset=utf-8")
+        # freeze
       end
     
-      it "should return json if json is requested" do
-        get "/find?type=text&input=&format=json"
-        last_response.body.should include('{"response":{')
-      end
+      # it "should return json if json is requested" do
+      #   get "/find?type=text&input=&format=json"
+      #   last_response.body.should include('{"response":{')
+      # end
     
       it "should properly set the content headers for json" do
         get "/find?type=text&input=&format=json"
         last_response.headers['Content-Type'].should include("application/json;charset=utf-8")
+        # freeze
       end
     end
     
-    describe "offset tests" do
-      it "should return another proper offset with weird whitespace" do
-        text = "dksjlf sldkjfl sdkljf slkdjf lksdj flksjd flksjdf          lskdjflksdj Canis lupus familiaris buhh"
-        get "/find?type=text&input=#{URI.escape text}"
-        last_response.body.should include("<offset start=\"71\" end=\"92\"/>")
-      end
-    
-      it "should return a proper offset even if the string begins with spaces" do
-        text = "       dksjlf sldkjfl sdkljf slkdjf lksdj flksjd flksjdf          lskdjflksdj Canis lupus familiaris buhh"
-        get "/find?type=text&input=#{URI.escape text}"
-        last_response.body.should include("<offset start=\"78\" end=\"99\"/>")
-      end
-    end
+    # describe "offset tests" do
+    #   it "should return another proper offset with weird whitespace" do
+    #     text = "dksjlf sldkjfl sdkljf slkdjf lksdj flksjd flksjdf          lskdjflksdj Canis lupus familiaris buhh"
+    #     get "/find?type=text&input=#{URI.escape text}"
+    #     last_response.body.should include("<offset start=\"71\" end=\"92\"/>")
+    #   end
+    # 
+    #   it "should return a proper offset even if the string begins with spaces" do
+    #     text = "       dksjlf sldkjfl sdkljf slkdjf lksdj flksjd flksjdf          lskdjflksdj Canis lupus familiaris buhh"
+    #     get "/find?type=text&input=#{URI.escape text}"
+    #     last_response.body.should include("<offset start=\"78\" end=\"99\"/>")
+    #   end
+    # end
     
     describe "url tests" do
       before :all do
         REAL_URL = URI.escape "http://www.bacterio.cict.fr/d/desulfotomaculum.html"
         
-        FakeWeb.register_uri(:get, REAL_URL, :body => "Desulfosporosinus orientis and also Desulfotomaculum alkaliphilum win")
+        # FakeWeb.register_uri(:get, REAL_URL, :body => "Desulfosporosinus orientis and also Desulfotomaculum alkaliphilum win")
       end
 
       it "should use nokogiri for html" do
         HTML_URL = 'http://localhost/animalia.html'
-        FakeWeb.register_uri(:get, HTML_URL, :body => '<html><head>
-        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-
-        <title>Animalia in GURPS</title>
-        </head><body bgcolor="#c0c0c0" text="#000000">
-        <h1>Animalia in GURPS</h1>
-        <ul>
-        <li>Chordata
-        <ul>
-        <li>Pelycosaurs
-        </li><li>Dinocephalia
-        </li><li>Dicynodontia
-        </li><li>Gorgonopsia
-        </li><li>Cynodonts
-        </li><li>Mammalia: The furry and the whiskered.
-        </ul></ul>
-        </body></html>')
+        # FakeWeb.register_uri(:get, HTML_URL, :body => '<html><head>
+        # <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+        # 
+        # <title>Animalia in GURPS</title>
+        # </head><body bgcolor="#c0c0c0" text="#000000">
+        # <h1>Animalia in GURPS</h1>
+        # <ul>
+        # <li>Chordata
+        # <ul>
+        # <li>Pelycosaurs
+        # </li><li>Dinocephalia
+        # </li><li>Dicynodontia
+        # </li><li>Gorgonopsia
+        # </li><li>Cynodonts
+        # </li><li>Mammalia: The furry and the whiskered.
+        # </ul></ul>
+        # </body></html>')
         get "/find?type=url&input=#{HTML_URL}"
         # last_response.body.should == ""
         assert last_response.body.include?('<verbatim>Dicynodontia</verbatim>')
@@ -179,63 +184,63 @@ FakeWeb.allow_net_connect = false
         
       it "should not use nokogiri for non html" do
         TEXT_URL = URI.escape 'http://localhost/bit.txt'
-        FakeWeb.register_uri(:get, TEXT_URL, :body => "California), p. 365. 
-        ^.. 
-        1 
-        li 
-        } 
-        ^ 
-        ^ J 
-        r ^^ 
-        I' 
-        HH^sf^^^^M 
-        ^^H 
-        mjmrn^ 
-        i 
-        9 
-        i 
-        i^<A 
-        ..... ..:l:illlfc. 
-        ^ 
-        m 
-        K . 
-        i 
-        y 
-        % 
-        e 
-        ^^ - 
-        j^ 
-        <#*!ftfe. Jl 
-        iHk 
-        ^g. 
-        flft 
-        1 ^H 
-        ^^^^^■W^ \IT ^1^ Jll^fl^V 
-        1 
-        ^B ''i 
-        ^^ 
-        •, 
-        ^ 
-        B^^^L 
-        i 
-        ■jo 
-        1 
-        * 
-        k J i 
-        Bv 
-        ^ 
-        1^ 
-        %*j%*^^^^B 
-        * 
-        M 
-        W^ 
-        k 
-        M 
-        P 
-        Plate 35 
-        PEARL OYSTERS AND MUSSELS 
-        a. Lister's Tree Oyster, Isognomon radiatus Anton, l]/^ inches (South- 
-        ")
+        # FakeWeb.register_uri(:get, TEXT_URL, :body => "California), p. 365. 
+        # ^.. 
+        # 1 
+        # li 
+        # } 
+        # ^ 
+        # ^ J 
+        # r ^^ 
+        # I' 
+        # HH^sf^^^^M 
+        # ^^H 
+        # mjmrn^ 
+        # i 
+        # 9 
+        # i 
+        # i^<A 
+        # ..... ..:l:illlfc. 
+        # ^ 
+        # m 
+        # K . 
+        # i 
+        # y 
+        # % 
+        # e 
+        # ^^ - 
+        # j^ 
+        # <#*!ftfe. Jl 
+        # iHk 
+        # ^g. 
+        # flft 
+        # 1 ^H 
+        # ^^^^^■W^ \IT ^1^ Jll^fl^V 
+        # 1 
+        # ^B ''i 
+        # ^^ 
+        # •, 
+        # ^ 
+        # B^^^L 
+        # i 
+        # ■jo 
+        # 1 
+        # * 
+        # k J i 
+        # Bv 
+        # ^ 
+        # 1^ 
+        # %*j%*^^^^B 
+        # * 
+        # M 
+        # W^ 
+        # k 
+        # M 
+        # P 
+        # Plate 35 
+        # PEARL OYSTERS AND MUSSELS 
+        # a. Lister's Tree Oyster, Isognomon radiatus Anton, l]/^ inches (South- 
+        # ")
         get "/find?type=url&input=#{TEXT_URL}"
         # last_response.body.should == ""
         assert last_response.body.include?('<verbatim>Isognomon radiatus</verbatim>')
@@ -243,9 +248,10 @@ FakeWeb.allow_net_connect = false
 
       it "should return all names from local URL" do
         LOCAL_URL = URI.escape 'http://localhost/Ifamericanseashell.txt'
-        FakeWeb.register_uri(:get, LOCAL_URL, :body => "a. Lister's Tree Oyster, Isognomon radiatus Anton, l]/^ inches (South")
+        # FakeWeb.register_uri(:get, LOCAL_URL, :body => "a. Lister's Tree Oyster, Isognomon radiatus Anton, l]/^ inches (South")
         get "/find?type=url&input=#{LOCAL_URL}"
         assert last_response.body.include?('<verbatim>Isognomon radiatus</verbatim>')
+        # !!!
       end  
     
       it "should return a verbatim name when a valid species name is identified in the supplied url" do
