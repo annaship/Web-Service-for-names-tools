@@ -25,15 +25,21 @@ class NetiTaxonFinderClient
     names_hash = {}
     names_arr = []
 
+    File.open("log.txt",'a') { |logger|  logger.puts "Sending to socket: \n...#{data[-100..-1]}"}
+    
     socket.puts data
     output = ""
     while !socket.eof? do
+      File.open("log.txt",'a') { |logger|  logger.puts "."}
       output = output + socket.read(1024)
     end
     
+    File.open("log.txt",'a') { |logger|  logger.puts "got back: \n#{output}"}
+    
+    
     socket.close 
     
-    @names = output.gsub("\t","\n")
+    @names = output
     
     current_pos = 1
     @names.each do |name|
