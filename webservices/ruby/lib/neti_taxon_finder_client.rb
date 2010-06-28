@@ -39,8 +39,7 @@ class NetiTaxonFinderClient
     @names.each do |name|
       name = name.strip
       current_pos += name.size
-      a_name = Name.new(name, current_pos) unless name.blank?
-      names_arr << a_name
+      names_arr << Name.new(name, current_pos) unless name.blank?
     end
     @names = names_arr
     
