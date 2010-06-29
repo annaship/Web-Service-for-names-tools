@@ -4,8 +4,8 @@ t1 = time.clock()
 from netineti import *
 print "NetiNeti: Initializing... model training..."
 # NN = NetiNetiTrain("species_train.txt")
-# NN = NetiNetiTrain()
-# nf = nameFinder(NN)
+NN = NetiNetiTrain()
+nf = nameFinder(NN)
 t2 = time.clock()
 t = t2 - t1
 t = t / 60
@@ -46,58 +46,25 @@ def listener(sock, *args):
  
 def handler(conn, *args):
 	'''Asynchronous connection handler. Processes each line from the socket.'''
-	data_size = 1024
-	line = conn.recv(data_size)
-	if len(line) < data_size:
-		print "len(line) = %s\n" % len(line)
-		conn.send(line.upper())
-		print "Connection closed."
+	global total_data
+	data = conn.recv(1024)
+	if len(data) < 1024:
+		total_data = total_data + data
+		conn_name = conn.getpeername()
+		print "NetiNeti: Connection %s closed." % conn_name[1]
+		t2 = time.clock()
+		t = t2 - t_connected
+		print t
+		conn.send(nf.find_names(total_data))
+		total_data = ""
 		return False
 	else:
-		print line
-		conn.send(line.upper())
+		total_data = total_data + data
 		return True
-
-# def handler(conn, *args):
-# 	'''Asynchronous connection handler. Processes each line from the socket.'''
-# 	# total_data = ""
-# 	data = conn.recv(1024)
-# 	print "len(data) = %s\n" % len(data)
-# 	if not len(data):
-# 		conn_name = conn.getpeername()
-# 		print "NetiNeti: Connection %s closed." % conn_name[1]
-# 		return False
-# 	else:
-# 		conn.send(data.upper())
-# 		print "data1.size = %s\n" % len(data)
-# 		return True
-	
-	#   
-	# data = conn.recv(1024)
-	# print "data = %s" % data
-	# print "len(data) = %s\n" % len(data)
-	# if len(data) < 1024:
-	# 	total_data = total_data + data
-	# 	conn_name = conn.getpeername()
-	# 	print "NetiNeti: Connection %s closed." % conn_name[1]
-	# 	t2 = time.clock()
-	# 	t = t2 - t_connected
-	# 	print t
-	# 	# conn.send(nf.find_names(data))
-	# 	# conn.send(nf.find_names(total_data))
-	# 	# conn.send(data.upper())
-	# 	conn.send(total_data.upper())
-	# 	print "total_data.size = %s\n" % len(total_data)
-	# 	total_data = ""
-	# 	return False
-	# else:
-	# 	total_data = total_data + data
-	# 	print "total_data.size = %s\n" % len(total_data)
-	# 	return True
 		
  
 if __name__=='__main__':
 	read_config()
 	server(host, port)
-	# total_data = ""
+	total_data = ""
 	gobject.MainLoop().run()

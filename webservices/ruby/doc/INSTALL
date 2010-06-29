@@ -1,0 +1,85 @@
+NameFinding Webservice Installation
+====================================
+
+Preparing the Environment
+-------------------------
+
+### Setting Up Ruby
+The first step to installing the NameFinding webservices is preparing the environment. The webservices require Ruby version 1.8.6 or higher and Rubygems 1.3 or higher.
+
+To install on Mac OS X, all you need to do is update your Rubygems. Open a new Terminal and the following command; enter your login password when prompted.
+
+`sudo gem update --system`
+
+To install on Linux, install Ruby using your preferred method: a package manager, download the rpms or source from <http://www.ruby-lang.org/en/downloads/> (scroll down to the Linux section).
+
+
+Installing Webservice
+-------------------------------
+
+### Check Out the Webservice Code
+In the Terminal, navigate to the location on your filesystem where you'd like to install the webservices, and type in 
+
+`svn co svn://repository/ligercat/rails/trunk ligercat`
+
+
+### Install the Required Rubygems
+Now you need to install the Ruby libraries (called gems) that the webservices require.
+
+Change directory to the webservices directory that you just checked out. *This directory will be referred to as the WEB_ROOT directory from now on.*
+
+`cd WEB_ROOT`
+
+Now paste the following three commands into the terminal.
+
+
+`sudo gem install sinatra
+sudo gem install nokogiri
+sudo gem install uri
+sudo gem install open-uri
+sudo gem install base64
+sudo gem install builder
+sudo gem install active_support`
+
+
+
+Installing TaxonFinder
+-------------------------------
+
+### Check Out the TaxonFinder Code
+In the Terminal, navigate to the location on your filesystem where you'd like to install TaxonFinder, and type in 
+
+`svn co svn://repository/ligercat/rails/trunk taxonfinder`
+
+
+Running TaxonFinder
+-------------------------------
+
+Change directory to the TaxonFinder directory that you just checked out.
+
+Enter the following command into the terminal.
+
+`perl server.pl &`
+
+This will launch the perl server on the loopback interface, running on port 1234. Configuration options for the interface and port number can be found within the servel.pl script.
+
+
+Running the webservices
+----------------
+
+The webservices are written using the "Sinatra" framework which comes with an inbuild web server. To run the webservices on your machine, you simple need to navigate to the WEB_ROOT directory and type the following command:
+
+`ruby taxon_finder_web_service.rb`
+
+
+Deploying the webservices
+------------------
+
+The preferred method for running the webservices in production is Nginx + Phusion Passenger, although any rack aware web server will work for serving the web services (more details can be found at http://rack.rubyforge.org/)
+
+If using nginx or apache with Phusion passenger, simply create a virtualhost as follows:
+
+<VirtualHost *:80>
+ServerName the_dns_name_of_your_webserver
+DocumentRoot /WEB_ROOT/public
+</VirtualHost>

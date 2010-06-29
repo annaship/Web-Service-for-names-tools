@@ -1,5 +1,4 @@
 #! /bin/bash
 
 kill_by_name -9 "ruby|python"
-rm public/upload/*
-
+rm ../Facade_demo_for_neti_and_reconciliation/tmp/*

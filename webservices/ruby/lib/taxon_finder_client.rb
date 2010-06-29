@@ -9,10 +9,10 @@ class Object
 end
 
 class TaxonFinderClient
-  def initialize(host = 'localhost', port = 3003)
+  def initialize(host='localhost', port=1234)
     @host = host
     @port = port
-    socket
+    @socket = socket
   end
   
   def add_name(name)
@@ -20,10 +20,6 @@ class TaxonFinderClient
   end
   
   def get(str)
-    
-    # file_inp = open("/Library/Webserver/Documents/Ifamericanseashell.txt")
-    # str = file_inp.read
-    
     @names = []
     @current_string = ''
     @current_string_state = ''
@@ -39,11 +35,6 @@ class TaxonFinderClient
       current_position += 1
     end
     @socket.close
-    
-    file_outp = open("/Users/anna/work/test_neti_app/test_web_service/out_file_new-or-file.txt", 'w')
-    file_outp.write @names.inspect.to_s
-    file_outp.close
-    
     @names
   end
   
@@ -51,13 +42,14 @@ class TaxonFinderClient
   
   def taxon_find(word, current_position)
     input = "#{word}|#{@current_string}|#{@current_string_state}|#{@word_list_matches}|0"
-    @socket.puts input
+    @socket.write(input + "\n")
     if output = @socket.gets
       response = parse_socket_response(output)
       return if not response
       
-      add_name Name.new(response.return_string, response.return_score, current_position) unless response.return_string.blank?
-      add_name Name.new(response.return_string_2, response.return_score_2, current_position) unless response.return_string_2.blank?
+      #score is always 100 for this dictionary lookup
+      add_name Name.new(response.return_string, current_position) unless response.return_string.blank?
+      add_name Name.new(response.return_string_2, current_position) unless response.return_string_2.blank?
     end
   end
   

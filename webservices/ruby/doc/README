@@ -1,0 +1,142 @@
+NameFinding API Documentation
+
+Required Gems:
+rubygems sinatra nokogiri uri open-uri base64 builder active_support
+
+Dependencies:
+TaxonFinder Perl server
+
+
+URL:
+http://namefinding.localhost/find/
+
+
+ 
+Inputs:
+
+-text
+--description:  free text which you want to run name finding on.
+--example:      "Mus musculus is a species in this sentence"
+--usage:        http://namefinding.localhost/find?text=Mus+musculus+is+a+species+in+this+sentence
+
+-encodedtext
+--description:  The recommended method of providing free text. This is a Base64 encoded version of the text parameter.
+--example:      "TXVzK211c2N1bHVzK2lzK2Erc3BlY2llcytpbit0aGlzK3NlbnRlbmNl"
+--usage:        http://namefinding.localhost/find?encodedtext=TXVzK211c2N1bHVzK2lzK2Erc3BlY2llcytpbit0aGlzK3NlbnRlbmNl
+
+-url
+--description:  URL of a site which you wish to run name finding on. The url must contain scheme/protocol.
+--example:      "http://www.ubio.org/tools/Small.txt"
+--usage:        http://namefinding.localhost/find?url=http://www.ubio.org/tools/Small.txt
+
+
+-encodedurl
+--description:  The recommended method of providing a URL, this is a Base64 encoded version of the url parameter. An encoded URL must be used when URLs contain query string parameters that match those of the webservice - example "aHR0cDovL3d3dy51YmlvLm9yZy90b29scy9TbWFsbC50eHQ="
+--example:      "aHR0cDovL3d3dy51YmlvLm9yZy90b29scy9TbWFsbC50eHQ="
+--usage:        http://namefinding.localhost/find?encodedurl=aHR0cDovL3d3dy51YmlvLm9yZy90b29scy9TbWFsbC50eHQ=
+
+
+-format
+--description:  The preferred output format. This will default to XML if not provided.
+--options:      xml,json
+--example:      json
+--usage:        http://namefinding.localhost/find?url=http://www.ubio.org/tools/Small.txt&format=json
+
+
+HTTP Method(s):
+GET
+ 
+Requires Authentication:
+false
+ 
+Rate limited:
+false
+ 
+Outputs:
+
+Each name found will return the following details:
+
+verbatim:           The exact string which was matched
+dwc:scientificName: The scientific name which was found
+offset:             The character offsets of the first and last characters in the name
+
+
+Response: 
+XML example (truncated):
+          
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <names xmlns:dwc="http://rs.tdwg.org/dwc/terms/">
+    <name>
+      <verbatim>Angiospermae</verbatim>
+      <dwc:scientificName>Angiospermae</dwc:scientificName>
+      <offsets>
+        <offset start="599" end="610"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Cycadales</verbatim>
+      <dwc:scientificName>Cycadales</dwc:scientificName>
+      <offsets>
+        <offset start="1239" end="1247"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Taxaceae</verbatim>
+      <dwc:scientificName>Taxaceae</dwc:scientificName>
+      <offsets>
+        <offset start="1438" end="1445"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Cycadales</verbatim>
+      <dwc:scientificName>Cycadales</dwc:scientificName>
+      <offsets>
+        <offset start="1634" end="1642"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Pinales</verbatim>
+      <dwc:scientificName>Pinales</dwc:scientificName>
+      <offsets>
+        <offset start="1714" end="1720"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Angiospermae</verbatim>
+      <dwc:scientificName>Angiospermae</dwc:scientificName>
+      <offsets>
+        <offset start="1758" end="1769"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Pandanales</verbatim>
+      <dwc:scientificName>Pandanales</dwc:scientificName>
+      <offsets>
+        <offset start="2684" end="2693"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Arales</verbatim>
+      <dwc:scientificName>Arales</dwc:scientificName>
+      <offsets>
+        <offset start="2823" end="2828"/>
+      </offsets>
+    </name>
+    <name>
+      <verbatim>Poales</verbatim>
+      <dwc:scientificName>Poales</dwc:scientificName>
+      <offsets>
+        <offset start="3058" end="3063"/>
+      </offsets>
+    </name>
+  </names>
+</response>
+
+
+
+
+
+
+
+

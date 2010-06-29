@@ -13,20 +13,23 @@
 <% end %>
 
 <br />
+<%= will_paginate @page_res %>
 
 <% unless @page_res.to_s.empty? %>
-	<%= will_paginate @page_res %>
 
-	<table class='nice'>
-		<tr>
-	    <th>Verbatim String (as appears in text)</th>
-	    <th>Scientific name</th>
-		</tr> 
-		<% @page_res.each do |name| %>
-			<tr><td><%= name[0] %></td><td><%= name[1] %></td></tr>
-		<% end %>
-	</table>
+<table class='nice'>
+	<tr>
+    <th>Verbatim String (as appears in text)</th>
+    <th>Scientific name</th>
+	</tr> 
+			<% @page_res.each do |name| %>
+				<tr><td><%= name[0] %></td><td><%= name[1] %></td></tr>
+			<% end %>
+</table>
 <% end %>
+
+<%#= will_paginate @page_res %>
+<!-- <br /> -->
 
 <!-- <a href='/call_for_rec'>Reconcile</a> -->
 

@@ -1,18 +1,17 @@
-import socket
-import threading
-import SocketServer
+import gobject, socket, time
 import yaml
-
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
-
-	def handle(self):
-		data = self.request.recv(1024)
-		cur_thread = threading.currentThread()
-		response = "%s: %s" % (cur_thread.getName(), data)
-		self.request.send(response)
-
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    pass
+t1 = time.clock()
+from netineti import *
+print "NetiNeti: Initializing... model training..."
+# NN = NetiNetiTrain("species_train.txt")
+NN = NetiNetiTrain()
+nf = nameFinder(NN)
+t2 = time.clock()
+t = t2 - t1
+t = t / 60
+print "NetiNeti: ...model ready in %s min." % t
+t2 = 0
+t = 0
 
 def read_config():
 	global host
@@ -23,31 +22,49 @@ def read_config():
 	host = dataMap['neti_neti_tf']['host']
 	port = dataMap['neti_neti_tf']['port']
 
-def client(ip, port, message):
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	sock.connect((ip, port))
-	sock.send(message)
-	response = sock.recv(1024)
-	print "Received: %s" % response
-	sock.close()
 
-if __name__ == "__main__":
-    # Port 0 means to select an arbitrary unused port
-    # HOST, PORT = "localhost", 1234
+def server(host, port):
+	'''NetiNeti: Initialize server and start listening.'''
+	sock = socket.socket()
+	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	sock.bind((host, port))
+	sock.listen(1)
+	print "NetiNeti: Listening..."
+	gobject.io_add_watch(sock, gobject.IO_IN, listener)
+ 
+ 
+def listener(sock, *args):
+	'''Asynchronous connection listener. Starts a handler for each connection.'''
+	conn, addr = sock.accept()
+	conn_name = conn.getpeername()
+	print "NetiNeti: Connected %s" % conn_name[1]
+	global t_connected
+	t_connected = time.clock()
+	gobject.io_add_watch(conn, gobject.IO_IN, handler)
+	return True
+ 
+ 
+def handler(conn, *args):
+	'''Asynchronous connection handler. Processes each line from the socket.'''
+	global total_data
+	data = conn.recv(1024)
+	if len(data) < 1024:
+		total_data = total_data + data
+		conn_name = conn.getpeername()
+		print "NetiNeti: Connection %s closed." % conn_name[1]
+		t2 = time.clock()
+		t = t2 - t_connected
+		print t
+		conn.send(nf.find_names(total_data))
+		total_data = ""
+		return False
+	else:
+		total_data = total_data + data
+		return True
+		
+ 
+if __name__=='__main__':
 	read_config()
-	server = ThreadedTCPServer((host, port), ThreadedTCPRequestHandler)
-	ip, port = server.server_address
-
-    # Start a thread with the server -- that thread will then start one
-    # more thread for each request
-	server_thread = threading.Thread(target=server.serve_forever)
-    # Exit the server thread when the main thread terminates
-	server_thread.setDaemon(True)
-	server_thread.start()
-	print "Server loop running in thread:", server_thread.getName()
-
-	client(ip, port, "Hello World 1")
-	client(ip, port, "Hello World 2")
-	client(ip, port, "Hello World 3")
-
-	server.shutdown()
+	server(host, port)
+	total_data = ""
+	gobject.MainLoop().run()

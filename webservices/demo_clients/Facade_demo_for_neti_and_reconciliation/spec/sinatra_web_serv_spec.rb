@@ -7,57 +7,6 @@ require 'ruby-debug'
 
 set :environment, :test
 
-describe 'Contact Us' do
-  include Rack::Test::Methods
-
-  def app
-    Sinatra::Application
-  end
-  
-  before :all do
-    @good_mail = "tetya-loshad@yandex.ru"
-    @bad_mail  = "uuu"
-    @good_body = "Oh, SOS!!!"
-    # post "/tf_result", params = {"url"=>@longURL, "url_e"=>"none", "text"=>""}
-  end
-  
-  it 'should show good form and recaptcha for contact us' do
-    get "/contact_us"
-    last_response.should be_ok
-  end
-
-
-# to pass this one, go to http://captchator.com/captcha/image/9060 and put result in captcha_answer
-  # it 'should send email if all right' do
-  #   post "/contact_us", params = {"email_sender"=>@good_mail, "email_message"=>@good_body, "captcha_answer"=>"wwayc", "captcha_session"=>"9060"}
-  #   last_response.body.should include("E-mail was sent, thank you")
-  # end
-  
-  it 'should rise errors if body is empty and mail address is not valid' do
-    post "/contact_us", params = {"email_sender"=>@bad_mail, "email_message"=>""}
-    last_response.body.should include("Please enter a message to send")
-    last_response.body.should include("Please enter a valid e-mail address")
-  end
-  
-  it 'should rise error if body is empty' do
-    post "/contact_us", params = {"email_sender"=>@good_mail, "email_message"=>""}
-    last_response.body.should include("Please enter a message to send")
-  end
-  
-  
-  it 'should rise error if mail address is not valid' do
-    post "/contact_us", params = {"email_sender"=>@bad_mail, "email_message"=>@good_body}
-    last_response.body.should include("Please enter a valid e-mail address")
-  end
-  
-  it 'should rise error if recaptcha is wrong' do 
-    post "/contact_us", params = {"email_sender"=>@good_mail, "email_message"=>@good_body, "captcha_answer"=>"aaa", "captcha_session"=>"9060"}
-    last_response.body.should include("Please enter correct word")
-    # last_response.body.should include("Please enter a valid e-mail address.")
-  end
-  
-end
-
 describe 'The Neti Neti ' do
 
   include Rack::Test::Methods
@@ -41978,12 +41927,13 @@ describe 'The Neti Neti ' do
       # last_response.should be_ok
       last_response.body.should_not include("Reading")
       # last_response.body.should include("<td>A. purpurea</td><td>Amaiiropsis purpurea</td>")    
-      last_response.body.should include("<td>A. irradians irradians</td><td>A. irradians irradians</td>")    
+      last_response.body.should include("<tr><td>A. scabra</td><td>Acmaea scabra</td>")    
     end    
     
     it "should upload file and return text" do
       post "/tf_result", params = {"url"=>"", "url_e"=>"", "text"=>"", "upload"=>@upload}
       get "/tf_result"
+
   #    last_response.should be_ok
       last_response.body.should include("target='new'>text_good1.txt</a>")
       last_response.body.should include("Mus musculus")

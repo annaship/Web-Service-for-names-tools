@@ -53,7 +53,7 @@ get '/find' do
   end
   names = client.find(input)  
   
-  # File.open("log.txt",'a') { |logger|  logger.puts "names is: \n#{names.inspect}"}
+  File.open("log.txt",'a') { |logger|  logger.puts "names is: \n#{names.inspect}"}
   
   if fmt == 'json'
     content_type 'application/json', :charset => 'utf-8'
