@@ -1,0 +1,91 @@
+* {
+  margin: 0;
+  padding: 0; }
+
+body, div, span, p, a, img, ul, ol, li, caption, table, thead, tbody, tfoot, tr, th, td, form, fieldset, legend, label, dl, dt, dd, blockquote, applet, object, h1, h2, h3, h4, h5 {
+  border: 0; }
+
+body {
+  padding: 20px 0;
+  font: 0.8em/1.5 "arial", sans-serif;
+  text-align: center;
+  background: white;
+  color: black; }
+
+/*div#content {
+ * *	margin-left: auto;
+ * *	margin-right: auto;
+ * *	width: 80%;
+ * *} */
+/*h1, h2 {margin: 15px 0 10px 0;}
+ * *h3, h4, h5, h6 {margin: 5px 0 10px 0;}
+ * *h1 {font-size: 260%; font-weight: normal; letter-spacing: -1px;}
+ * *h2 {font-size: 160%; font-weight: normal;}
+ * *h3 {font-size: 140%; font-weight: normal;}
+ * *h4, h5 {font-size: 100%;} */
+/*p, ul, ol, dl, fieldset {margin: 10px 0;}
+ * *table {margin-left: auto; margin-right: auto; border-collapse: collapse; border-spacing: 0; font-size: 100%;} */
+/*th {text-align: left; font-weight: bold;} */
+/*th, td {padding: 3px 7px;} */
+/*ul, ol {margin-left: 30px;}
+ * *ul ul, ol ol {margin: 0; margin-left: 20px;}
+ * *ol {list-style-type: decimal;}
+ * *li {display: list-item;} */
+/*form {width: 70%;} */
+/*form {margin-left: auto; margin-right: auto;} */
+form p label {
+  float: left;
+  text-align: right;
+  width: 17em;
+  /*	padding: 0px 5px; */ }
+
+input[type="submit"] {
+  padding: 2px;
+  font: normal 100%/1.2 "arial", sans-serif;
+  border: 0.1em solid #46a912;
+  background: #46a912;
+  color: white; }
+
+td.label {
+  float: left;
+  text-align: right;
+  padding-left: 0.4em; }
+
+option.pretty {
+  padding-left: 0.1em; }
+
+.my_input {
+  width: 100%;
+  background: #f6f6f6; }
+
+/*input.my_size  {size: 100%; background:#ededed;} */
+/*textarea.my_width {width: 34em;} */
+/*div#wrapper {text-align: center;} */
+table {
+  margin-left: auto;
+  margin-right: auto;
+  /*	width: 70%; */
+  text-align: left; }
+  table.nice {
+    border-spacing: 2px 2px;
+    border-collapse: separate; }
+    table.nice tr {
+      background-color: #f6f6f6; }
+    table.nice td {
+      padding: 0.2em 0.5em; }
+      table.nice td.label {
+        float: right;
+        padding-right: 0.8em; }
+    table.nice a {
+      border-style: none; }
+      table.nice a:hover {
+        text-decoration: underline; }
+
+/* @group TABLES */
+th {
+  /*	padding: 0px 5px; */
+  /*	margin: 0px; */
+  font-weight: bold;
+  text-align: center; }
+
+/* @end */

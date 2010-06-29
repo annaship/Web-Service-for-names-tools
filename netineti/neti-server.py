@@ -46,25 +46,29 @@ def listener(sock, *args):
  
 def handler(conn, *args):
 	'''Asynchronous connection handler. Processes each line from the socket.'''
-	global total_data
-	data = conn.recv(1024)
-	if len(data) < 1024:
-		total_data = total_data + data
-		conn_name = conn.getpeername()
-		print "NetiNeti: Connection %s closed." % conn_name[1]
-		t2 = time.clock()
-		t = t2 - t_connected
-		print t
-		conn.send(nf.find_names(total_data))
-		total_data = ""
-		return False
-	else:
-		total_data = total_data + data
-		return True
+	# global total_data
+	data = conn.recv(8388608)
+	print "data = %s" % data
+	# if len(data) < 1024:
+	# total_data = total_data + data
+	conn_name = conn.getpeername()
+	print "NetiNeti: Connection %s closed." % conn_name[1]
+	t2 = time.clock()
+	t = t2 - t_connected
+	print t
+	conn.send(nf.find_names(data))
+	# conn.send(nf.find_names(total_data))
+	# conn.send(data.upper())
+	# conn.send(total_data.upper())
+	# total_data = ""
+	return False
+	# else:
+	# 	total_data = total_data + data
+	# 	return True
 		
  
 if __name__=='__main__':
 	read_config()
 	server(host, port)
-	total_data = ""
+	# total_data = ""
 	gobject.MainLoop().run()

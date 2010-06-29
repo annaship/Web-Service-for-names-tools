@@ -25,14 +25,15 @@ class NetiTaxonFinderClient
     names_hash = {}
     names_arr = []
 
-    File.open("log.txt",'a') { |logger|  logger.puts "Sending to socket: \n#{data}"}
-    
-    socket.write("Content-length: #{data.length}\r\n")
+    File.open("log.txt",'a') { |logger|  logger.puts "Sending to socket: \n#{data[-100..-1]}"}
+    data_length = data.length
+    socket.write("Content-length: #{data_length}\r\n")
     socket.write(data)
     socket.flush
 
-    response = socket.gets
-    puts "Received from server: #{response}"
+    # response = socket.gets
+    response = socket.read(data_length)
+    puts "Received from server: #{response[-100..-1]}"
 
     socket.close
 
