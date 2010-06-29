@@ -16,11 +16,13 @@ class ThreadedNetiHandler(SocketServer.StreamRequestHandler):
     content_length = int(content_length)
     
     data = self.rfile.read(content_length)
+    # print "data on server: %s\n" % (data, type(data))
+    print "data on server: %s, type(data) = %s\n" % (data, type(data))
     
     # print "Sleeping 10 seconds before sending response"
     # time.sleep(10)
-    # self.request.send( data.upper)
-    self.request.send( str(len(data)) )
+    # self.request.send( str(len(data)) )
+    self.request.send( data )
     print "Connection closed"
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
