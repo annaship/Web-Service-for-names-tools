@@ -22,32 +22,16 @@ class NetiTaxonFinderClient
   end
   
   def get(data)
-    names_hash = {}
-    names_arr = []
+    names_arr  = []
 
-    File.open("log.txt",'a') { |logger|  logger.puts "Sending to socket: \n#{data[-100..-1]}"}
     data_length = data.length
     socket.write("Content-length: #{data_length}\r\n")
     socket.write(data)
     socket.flush
 
-    # response = socket.gets
     response = socket.read(data_length)
-    puts "Received from server: #{response[-100..-1]}"
-
     socket.close
 
-    # output = ""
-    # while !socket.eof? do
-    #   File.open("log.txt",'a') { |logger|  logger.puts "."}
-    #   output = output + socket.read(1024)
-    # end
-    
-    File.open("log.txt",'a') { |logger|  logger.puts "got back: \n#{response}"}
-    
-    
-    # socket.close 
-    
     @names = response
     
     current_pos = 1

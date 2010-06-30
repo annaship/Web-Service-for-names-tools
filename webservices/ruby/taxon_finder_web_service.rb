@@ -51,10 +51,7 @@ get '/find' do
       status(400)
     end
   end
-  names = client.find(input)  
-  
-  File.open("log.txt",'a') { |logger|  logger.puts "names is: \n#{names.inspect}"}
-  
+  names = client.find(input)
   if fmt == 'json'
     content_type 'application/json', :charset => 'utf-8'
     return to_json(names)

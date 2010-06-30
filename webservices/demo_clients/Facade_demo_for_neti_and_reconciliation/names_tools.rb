@@ -3,21 +3,16 @@ require 'rubygems'
 require 'sinatra'
 require 'xmlsimple'
 require 'rest_client'
-# require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
+#require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
 require File.dirname(__FILE__) + '/config'
 require 'nokogiri'
 require 'uri'
 require 'open-uri'
 require 'base64'
-require 'ruby-debug'
-require 'pony'
-require File.dirname(__FILE__) + '/../../ruby/lib/app_lib'
-
-require 'sinatra/captcha'
-
+#require 'ruby-debug'
+# require 'mongrel'
 
 will_paginate_path = File.dirname(__FILE__) + "/tmp/will_paginate/lib"
-
 $LOAD_PATH.unshift will_paginate_path # using agnostic branch
  
 require will_paginate_path + '/will_paginate'
@@ -34,7 +29,6 @@ enable :sessions
 
 before do
   # set ports and addresses
-  read_config
   set_address
   set_vars
 end
@@ -50,30 +44,7 @@ get '/' do
   erb :index
 end
 
-get '/contact_us' do
-  erb :contact_us
-end
-
 post '/contact_us' do
-  params[:captcha_answer] ||= ""
-  @sender  = params["email_sender"]
-  @message = params["email_message"]
-  @errors  = {}
-  @contact_us_succ  = false
-  @errors[:sender]  = "Please enter a valid e-mail address" if (@sender.to_s.empty? || @sender !~ /(.+)@(.+)\.(.{2,})/)
-  @errors[:message] = "Please enter a message to send" if @message.to_s.empty?
-  @errors[:captcha] = "Please enter correct word" unless captcha_pass?
-
-  if @errors.all? {|error| error.empty?}
-    Pony.mail :to      => 'ashipunova@mbl.edu',
-              :from    => @sender,
-              :subject => 'NetiNeti feedback',
-              :body    => @message
-    @contact_us_succ = true
-    erb :index
-  else
-    erb :contact_us
-  end
 end
 
 # NentiNeti Taxon Finder
@@ -183,6 +154,10 @@ post '/submit' do
   end
 end
 
+get '/contact_us' do
+  erb :contact_us
+end
+
 # =============
 
 def upload_file(upload = "")
@@ -287,3 +262,4 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
     end
   end
 end
+
