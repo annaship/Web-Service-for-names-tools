@@ -85,19 +85,26 @@ end
 
 get '/tf_result' do
   begin 
+    puts "=" * 80
+    # print "@@url = %s;\n@@tf_result = %s\n" % [@@url, @@tf_result[-50..-1].inspect] 
+    puts "params = " + params.inspect
+    # tf_result   = params[:tf_result]
+    url         = params[:url]
+    pure_f_name = params[:pure_f_name]
+    t           = params[:t].to_f
+    t1          = params[:t1].to_f
+    
     total_pages  = 0
     per_page     = 30
     params[:page].to_i >= 1 ? page_number = params[:page].to_i : page_number = 1
-    print "============ @@tf_result, /tf_result = %s\n" % @@tf_result.inspect
     @page_res    = @@tf_result.paginate(:page => page_number, :per_page => per_page)
     page_number  = 1 unless page_number <= @page_res.total_pages 
     #again, because in first place we can't count @page_res.total_pages
     @page_res    = @@tf_result.paginate(:page => page_number, :per_page => per_page)
     @i           = @page_res.total_entries
-    @url         = $url
-    @pure_f_name = $pure_f_name
-    # time_result  = $t1-$t
-    @time_result = sprintf("%5.5f", $t1-$t)
+    @url         = url
+    @pure_f_name = pure_f_name
+    @time_result = sprintf("%5.5f", t1-t)
 
     erb :tf_result
   rescue Exception => err
@@ -108,7 +115,7 @@ end
 
 post '/tf_result' do
   begin
-    $t = Time.now.to_f
+    t = Time.now.to_f
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
@@ -128,13 +135,12 @@ post '/tf_result' do
     if xml_data
       data = XmlSimple.xml_in(xml_data)
       @@tf_result = set_result(data)
-      print "============ @@tf_result, post '/tf_result' = %s\n" % @@tf_result.inspect
-      $url         = @url
-      $pure_f_name = @pure_f_name
-      $t1 = Time.now.to_f
+      url = @url
+      pure_f_name = @pure_f_name
+      t1 = Time.now.to_f
     end
 
-    redirect "/tf_result"
+    redirect "/tf_result?url=#{url}&t=#{t}&t1=#{t1}&pure_f_name=#{pure_f_name}"
 
   # rescue RestClient::InternalServerError, RestClient::RequestTimeout, RestClient::BadRequest
   rescue Exception => err
