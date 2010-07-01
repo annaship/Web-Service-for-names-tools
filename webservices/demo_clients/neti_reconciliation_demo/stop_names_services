@@ -1,0 +1,5 @@
+#! /bin/bash
+
+kill_by_name -9 "ruby|python"
+rm /public/upload/*
+

@@ -3,16 +3,21 @@ require 'rubygems'
 require 'sinatra'
 require 'xmlsimple'
 require 'rest_client'
-#require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
+# require File.dirname(__FILE__) + '/../webservices/lib/neti_taxon_finder_client'
 require File.dirname(__FILE__) + '/config'
 require 'nokogiri'
 require 'uri'
 require 'open-uri'
 require 'base64'
-#require 'ruby-debug'
-# require 'mongrel'
+require 'ruby-debug'
+require 'pony'
+require File.dirname(__FILE__) + '/../../ruby/lib/app_lib'
+
+require 'sinatra/captcha'
+
 
 will_paginate_path = File.dirname(__FILE__) + "/tmp/will_paginate/lib"
+
 $LOAD_PATH.unshift will_paginate_path # using agnostic branch
  
 require will_paginate_path + '/will_paginate'
@@ -29,6 +34,7 @@ enable :sessions
 
 before do
   # set ports and addresses
+  read_config
   set_address
   set_vars
 end
@@ -44,7 +50,30 @@ get '/' do
   erb :index
 end
 
+get '/contact_us' do
+  erb :contact_us
+end
+
 post '/contact_us' do
+  params[:captcha_answer] ||= ""
+  @sender  = params["email_sender"]
+  @message = params["email_message"]
+  @errors  = {}
+  @contact_us_succ  = false
+  @errors[:sender]  = "Please enter a valid e-mail address" if (@sender.to_s.empty? || @sender !~ /(.+)@(.+)\.(.{2,})/)
+  @errors[:message] = "Please enter a message to send" if @message.to_s.empty?
+  @errors[:captcha] = "Please enter correct word" unless captcha_pass?
+
+  if @errors.all? {|error| error.empty?}
+    Pony.mail :to      => 'ashipunova@mbl.edu',
+              :from    => @sender,
+              :subject => 'NetiNeti feedback',
+              :body    => @message
+    @contact_us_succ = true
+    erb :index
+  else
+    erb :contact_us
+  end
 end
 
 # NentiNeti Taxon Finder
@@ -59,6 +88,7 @@ get '/tf_result' do
     total_pages  = 0
     per_page     = 30
     params[:page].to_i >= 1 ? page_number = params[:page].to_i : page_number = 1
+    print "============ @@tf_result, /tf_result = %s\n" % @@tf_result
     @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
     page_number  = 1 unless page_number <= @page_res.total_pages 
     #again, because in first place we can't count @page_res.total_pages
@@ -97,7 +127,8 @@ post '/tf_result' do
 
     if xml_data
       data = XmlSimple.xml_in(xml_data)
-      set_result(data)
+      @@tf_result = set_result(data)
+      print "============ @@tf_result, post '/tf_result' = %s\n" % @@tf_result
       $url         = @url
       $pure_f_name = @pure_f_name
       $t1 = Time.now.to_f
@@ -154,10 +185,6 @@ post '/submit' do
   end
 end
 
-get '/contact_us' do
-  erb :contact_us
-end
-
 # =============
 
 def upload_file(upload = "")
@@ -211,13 +238,14 @@ def set_result(data)
     data["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
-      tf_result    << [verbatim, sciname]
+      tf_result     << [verbatim, sciname]
       write_to_file << sciname
     end
      write_to_file = write_to_file.sort.uniq
      write_neti_to_file(write_to_file.join("\n"))
   end
   $tf_result = tf_result.sort.uniq
+  return tf_result = "Ura, result!"
 end
 
 private
@@ -262,4 +290,3 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
     end
   end
 end
-
