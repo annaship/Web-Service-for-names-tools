@@ -88,11 +88,11 @@ get '/tf_result' do
     total_pages  = 0
     per_page     = 30
     params[:page].to_i >= 1 ? page_number = params[:page].to_i : page_number = 1
-    print "============ @@tf_result, /tf_result = %s\n" % @@tf_result
-    @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
+    print "============ @@tf_result, /tf_result = %s\n" % @@tf_result.inspect
+    @page_res    = @@tf_result.paginate(:page => page_number, :per_page => per_page)
     page_number  = 1 unless page_number <= @page_res.total_pages 
     #again, because in first place we can't count @page_res.total_pages
-    @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
+    @page_res    = @@tf_result.paginate(:page => page_number, :per_page => per_page)
     @i           = @page_res.total_entries
     @url         = $url
     @pure_f_name = $pure_f_name
@@ -128,7 +128,7 @@ post '/tf_result' do
     if xml_data
       data = XmlSimple.xml_in(xml_data)
       @@tf_result = set_result(data)
-      print "============ @@tf_result, post '/tf_result' = %s\n" % @@tf_result
+      print "============ @@tf_result, post '/tf_result' = %s\n" % @@tf_result.inspect
       $url         = @url
       $pure_f_name = @pure_f_name
       $t1 = Time.now.to_f
@@ -244,8 +244,7 @@ def set_result(data)
      write_to_file = write_to_file.sort.uniq
      write_neti_to_file(write_to_file.join("\n"))
   end
-  $tf_result = tf_result.sort.uniq
-  return tf_result = "Ura, result!"
+  tf_result = tf_result.sort.uniq
 end
 
 private
