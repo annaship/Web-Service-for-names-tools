@@ -84,30 +84,52 @@ get '/neti_tf' do
 end
 
 get '/tf_result' do
-  begin 
+  # begin 
+    puts "=" * 80
+    # print "@@url = %s;\n@@tf_result = %s\n" % [@@url, @@tf_result[-50..-1].inspect] 
+    puts "params = " + params.pretty_inspect
+    tf_result_file_name = params[:tf_result]
+    url         = params[:url]
+    pure_f_name = params[:pure_f_name]
+    t           = params[:t].to_f
+    t1          = params[:t1].to_f
+
+    tf_result = []
+    f = File.open(tf_result_file_name, 'r') 
+    f.each_line do |line|
+      puts "I read this line: #{line}"
+      line.chop
+      arr = line.split("_")
+      puts "arr = #{arr.pretty_inspect}"
+      tf_result << arr
+    end
+    f.close
+
+    puts "tf_result = "+ tf_result.pretty_inspect
+    puts "tf_result = "+ tf_result.class.inspect
+    
     total_pages  = 0
     per_page     = 30
     params[:page].to_i >= 1 ? page_number = params[:page].to_i : page_number = 1
-    @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
+    @page_res    = tf_result.paginate(:page => page_number, :per_page => per_page)
     page_number  = 1 unless page_number <= @page_res.total_pages 
     #again, because in first place we can't count @page_res.total_pages
-    @page_res    = $tf_result.paginate(:page => page_number, :per_page => per_page)
+    @page_res    = tf_result.paginate(:page => page_number, :per_page => per_page)
     @i           = @page_res.total_entries
-    @url         = $url
-    @pure_f_name = $pure_f_name
-    # time_result  = $t1-$t
-    @time_result = sprintf("%5.5f", $t1-$t)
+    @url         = url
+    @pure_f_name = pure_f_name
+    @time_result = sprintf("%5.5f", t1-t)
 
     erb :tf_result
-  rescue Exception => err
-    puts "----- Error in NetiNeti (get '/tf_result'): %s -----\n" % err
-    erb :err_message
-  end
+  # rescue Exception => err
+  #   puts "----- Error in NetiNeti (get '/tf_result'): %s -----\n" % err
+  #   erb :err_message
+  # end
 end
 
 post '/tf_result' do
-  begin
-    $t = Time.now.to_f
+  # begin
+    t = Time.now.to_f
     max_header = 1024 * (80 + 32)
     # max_header = Mongrel::Const::MAX_HEADER if Mongrel::Const::MAX_HEADER
 
@@ -126,19 +148,19 @@ post '/tf_result' do
 
     if xml_data
       data = XmlSimple.xml_in(xml_data)
-      set_result(data)
-      $url         = @url
-      $pure_f_name = @pure_f_name
-      $t1 = Time.now.to_f
+      tf_result = set_result(data)
+      url = @url
+      pure_f_name = @pure_f_name
+      t1 = Time.now.to_f
     end
 
-    redirect "/tf_result"
+    redirect "/tf_result?url=#{url}&t=#{t}&t1=#{t1}&pure_f_name=#{pure_f_name}&tf_result=#{tf_result}"
 
   # rescue RestClient::InternalServerError, RestClient::RequestTimeout, RestClient::BadRequest
-  rescue Exception => err
-    puts "----- Error in NetiNeti (post '/tf_result'): %s -----\n" % err
-    erb :err_message
-  end
+  # rescue Exception => err
+  #   puts "----- Error in NetiNeti (post '/tf_result'): %s -----\n" % err
+  #   erb :err_message
+  # end
 end
 
 # -------------
@@ -236,13 +258,35 @@ def set_result(data)
     data["name"].each do |item|
       verbatim  = item["verbatim"][0]
       sciname   = item["scientificName"][0]
-      tf_result    << [verbatim, sciname]
+      tf_result     << [verbatim, sciname].join("_") << "\n"
       write_to_file << sciname
     end
-     write_to_file = write_to_file.sort.uniq
-     write_neti_to_file(write_to_file.join("\n"))
+     # write_to_file = write_to_file.sort.uniq
+     # write_neti_to_file(write_to_file.join("\n"))
+     puts "=" * 80
+     print "tf_result = %s\n" % tf_result.inspect
+     neti_result_file_name = write_neti_to_file(tf_result)
+     # neti_result_file_name = write_neti_to_file(tf_result.sort.uniq.join("\n"))
+     #   b = a.each do |phil|
+     #   sink.write(phil)
+     # sink.close
+     # temp_res = tf_result.join("\n")
+
+    #  neti_result_file_name = File.dirname(__FILE__)+'/public/upload/'+'results.csv'
+    #  f = File.open(neti_result_file_name, 'w') 
+    #  # { |file| file.write temp_res } 
+    # 
+    #  tf_result.each do |res|
+    #   
+    #    f.write(res)
+    #    print "res = %s\n" % res.pretty_inspect
+    #    # temp_res = 
+    #  end
+    # f.close
+     # print "temp_res = %s\n" % temp_res
   end
-  $tf_result = tf_result.sort.uniq
+  # tf_result = tf_result.sort.uniq
+  tf_result = neti_result_file_name
 end
 
 private
@@ -257,13 +301,31 @@ def build_master_lists
 end
 
 def write_neti_to_file(text)
-  time_tmp     = Time.now.to_f.to_s
-  neti_result  = File.dirname(__FILE__)+'/public/upload/'+time_tmp+"_neti_result.txt"
-  f            = File.open(neti_result, 'wb')
-  f.write(text)
+  time_tmp       = Time.now.to_f.to_s
+  neti_result_fn = File.dirname(__FILE__)+'/public/upload/'+time_tmp+"_neti_result.txt"
+  f              = File.open(neti_result_fn, 'wb') 
+  
+  # neti_result_file_name = File.dirname(__FILE__)+'/public/upload/'+'results.csv'
+  # { |file| file.write temp_res } 
+
+  text.each do |res|
+   f.write(res)
+   print "res = %s\n" % res.pretty_inspect
+   # temp_res = 
+  end
   f.close
-  session[:neti_result_fname] = neti_result
+  return neti_result_fn
 end
+
+# def write_neti_to_file(text)
+#   time_tmp       = Time.now.to_f.to_s
+#   neti_result_fn = File.dirname(__FILE__)+'/public/upload/'+time_tmp+"_neti_result.txt"
+#   f              = File.open(neti_result_fn, 'wb')
+#   f.write(text)
+#   f.close
+#   session[:neti_result_fname] = neti_result_fn
+#   return neti_result_fn
+# end
 
 def clean_url(url)
   # good_url = URI.escape(URI.unescape(url).strip, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
