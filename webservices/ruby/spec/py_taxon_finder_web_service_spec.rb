@@ -22,21 +22,13 @@ describe "Taxon Finder Web Service" do
       @text_bad    = URI.escape 'first we; find Mus musculus and then we find M. musculus again'
       @text_bad_wn = URI.escape 'first we find Mus\
       musculus'
-
-      # There's no @env["REQUEST_URI"] on test env?
-      @text_ts     = "123;%20Mus%20musculus%20qwe;%20and%20Desulfosporosinus%20orientis%20ddd"
-      @type_t      = "type=text"
-      @encode_t    = "encoded=false"
     end
+
 
     it 'should parse params with semicolon correct' do
       url = "/find?type=text&input=#{@text_bad}"
       env = Rack::MockRequest.env_for(url)
       req = Rack::Request.new(env)
-      req.env["QUERY_STRING"].should == "type=text&input=first%20we%3D%20find%20Mus%20musculus%20and%20then%20we%20find%20M.%20musculus%20again"
-      
-      # got: #<Rack::Request:0x1018a3a48 @env={"SERVER_NAME"=>"example.org", "CONTENT_LENGTH"=>"0", "rack.url_scheme"=>"http", "HTTPS"=>"off", "rack.errors"=>#<StringIO:0x1018a3cc8>, "PATH_INFO"=>"/find", "rack.version"=>[1, 1], "rack.run_once"=>false, "SCRIPT_NAME"=>"", "rack.multithread"=>true, "rack.multiprocess"=>true, "SERVER_PORT"=>"80", "REQUEST_METHOD"=>"GET", "QUERY_STRING"=>"type=text&input=first%20we;%20find%20Mus%20musculus%20and%20then%20we%20find%20M.%20musculus%20again", "rack.input"=>#<StringIO:0x1018a3c50>}> (using ==)
-      #       
       req.params["input"].should == URI.unescape(@text_bad)
     end
 
@@ -46,6 +38,14 @@ describe "Taxon Finder Web Service" do
     end
 
 #  ------------- text / URL difference -------------
+
+    it "should show no result (not an error!) if there are no names" do
+      text = URI.escape "What a nice weather is today!"
+
+      get "/find?type=text&input=#{text}"
+      last_response.should be_ok
+      last_response.body.should include("names xmlns:dwc=\"http://rs.tdwg.org/dwc/terms/\"></names>")
+    end 
 
     it "should find a word in a text" do
       text = URI.escape "This genus was formerly placed 

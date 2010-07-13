@@ -1,56 +1,48 @@
-require 'rubygems'
-require 'sinatra'
-require File.dirname(__FILE__) + '/lib/taxon_finder_client'
-require File.dirname(__FILE__) + '/lib/neti_taxon_finder_client'
-require 'nokogiri'
 require 'uri'
 require 'open-uri'
-require 'base64'
+
+require 'rubygems'
+require 'bundler'
+Bundler.setup
+
 require 'builder'
 require 'json'
+require 'nokogiri'
+require 'sinatra'
+
+require File.dirname(__FILE__) + '/lib/taxon_finder_client'
+require File.dirname(__FILE__) + '/lib/neti_taxon_finder_client'
 require File.dirname(__FILE__) + '/lib/app_lib.rb'
 
 set :show_exceptions, false
 
 # Array of allowed formats
 valid_formats = %w[xml json]
-valid_types   = %w[text url encodedtext encodedurl]
 
 #show user an info page if they hit the index
 get '/' do
   "Taxon Name Finding API, documentation at http://code.google.com/p/taxon-name-processing"
 end
 
-"?input={url or text}&type={'url' & ('text')}&encoded={true (false)}&format={xml, json}"
+# "?input={url or text}&type={'url' & ('text')}&format={xml, json}"
 get '/find' do
   read_config
   client = NetiTaxonFinderClient.new @host
-  
-  if params[:type] == 'text' && @env["REQUEST_URI"]
-    inp_req = parse_request
-    inp_req = handle_semicolon(inp_req) while (inp_req =~ /;/)
-    params[:input] = inp_req.gsub(/input=/, '')
-  end
-
-  input = URI.unescape(params[:input]) rescue status(400)
   # default to xml
-  fmt     = params[:format]  || 'xml'
-  type    = params[:type]    || 'text'
-  encoded = params[:encoded] || 'false'
-
-  input = Base64::decode64(input) if encoded == 'true'
+  input = URI.unescape(params[:input]) rescue status(400)
+  fmt = params[:format] || 'xml'
+  type = params[:type] || 'text'
   if type == 'url'
-    begin
-      response = open(input).read
-      if response.include?('<html>')
-        input = Nokogiri::HTML(response).content
-      else
-        input = response
-      end
-    rescue 
-      status(400)
+    response = open(input).read rescue status(400)
+    # response doesn't have .include? if it's a fixnum
+    return "Is this really a URL? <a href=\"#{url_to_text(request.url)}>Try This</a>" if response.is_a? Fixnum
+    if response.include?('<html>')
+      input = Nokogiri::HTML(response).content
+    else
+      input = response
     end
   end
+  input.gsub!(';','')
   names = client.find(input)
   if fmt == 'json'
     content_type 'application/json', :charset => 'utf-8'
@@ -60,15 +52,19 @@ get '/find' do
   to_xml(names)
 end
 
+def url_to_text(url)
+  url.gsub(/type=url/, 'type=text')
+end
+
 def to_xml(names)
   xml = Builder::XmlMarkup.new
   xml.instruct!
-  xml.names("xmlns:dwc" => "http://rs.tdwg.org/dwc/terms/") do
+  xml.names("xmlns" =>"http://globalnames.org/namefinder", "xmlns:dwc" => "http://rs.tdwg.org/dwc/terms/") do
     names.each do |name|
       xml.name do
         xml.verbatim name.verbatim
         xml.dwc(:scientificName, name.scientific)
-        xml.score name.score
+        xml.score(name.score)
         xml.offset(:start => name.start_pos, :end => name.end_pos)
       end
     end    
@@ -87,14 +83,3 @@ def to_json(names)
   end
   return JSON.fast_generate({"names" => jsonnames})
 end
-
-def parse_request
-  input_text = @env["REQUEST_URI"]
-  input = input_text.gsub(/(.*)(input=.*?).(type|encoded|format).*/, '\2')
-  input = input.gsub(/(.*)(input=.*)$/, '\2')
-end
-
-def handle_semicolon(req)
-  req.gsub(/(input=.*?);([^&]*)/, '\1%3D\2')
-end
-

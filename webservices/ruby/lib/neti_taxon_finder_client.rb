@@ -22,28 +22,27 @@ class NetiTaxonFinderClient
   end
   
   def get(data)
-    names_hash = {}
-    names_arr = []
+    names_arr   = []
+    data_length = data.length
+    socket.write("Content-length: #{data_length}\r\n")
+    socket.write(data)
+    socket.flush
 
-    socket.puts data
-    output = ""
-    while !socket.eof? do
-      output = output + socket.read(1024)
-    end
-    
-    socket.close 
-    
-    @names = output.gsub("\t","\n")
-    
+    response = socket.read(data_length)
+    socket.close
+
+    @names = response
     current_pos = 1
-    @names.each do |name|
-      name = name.strip
-      current_pos += name.size
-      a_name = Name.new(name, current_pos) unless name.blank?
-      names_arr << a_name
+    if @names
+      @names.each do |name|
+        name = name.strip
+        current_pos += name.size
+        names_arr << Name.new(name, current_pos) unless name.blank?
+      end
+      @names = names_arr
+    else
+      @names = ""
     end
-    @names = names_arr
-    
     return @names
   end  
 
