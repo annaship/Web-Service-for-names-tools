@@ -90,13 +90,18 @@ post '/tf_result' do
 
     if xml_data
       data = XmlSimple.xml_in(xml_data)
-      set_result(data)
+      neti_result_fn = set_result(data)
+      puts "Here: neti_result_fn = #{neti_result_fn}"
       t1 = Time.now.to_f
     end
     @time_result = sprintf("%5.5f", t1-t)
-
-    erb :tf_result
-
+    # aa = neti_result_fn
+    # .gsub(/\//, '')
+    # aa = neti_result_fn.gsub(/^.+\/(.+)$/, '\1')
+    # @neti_result_f_name = neti_result_fn.gsub(/@upload_dir/, '')
+    # puts "=" * 80
+    # puts "aa = #{aa}, upload_dir = #{@upload_dir}, neti_result_fn = #{neti_result_fn}"
+    erb :tf_result, :locals => { :neti_result_f_name => neti_result_fn.gsub(/^.+\/(.+)$/, '\1') }
   rescue Exception => err
     puts "----- Error in Neti Neti (post '/tf_result'): %s -----\n" % err
     err_trace = err.backtrace.join("\n")
@@ -105,6 +110,8 @@ post '/tf_result' do
   end
 end
 
+
+
 # -------------
 # Reconciliation
 
@@ -112,10 +119,10 @@ get '/recon' do
   erb :rec_form
 end
 
-# get '/call_for_rec' do
-#   @neti_result_fname = session[:neti_result_fname]
-#   erb :call_for_rec
-# end
+get '/call_for_rec' do
+  @neti_result_fname = params[:neti_result_f_name]
+  erb :call_for_rec
+end
 
 post '/submit' do
   begin
@@ -209,6 +216,7 @@ def set_result(data)
      neti_result_fn = write_neti_to_file(write_to_file.join("\n"))
   end
   @tf_result = tf_result.sort.uniq
+  return neti_result_fn
 end
 
 private

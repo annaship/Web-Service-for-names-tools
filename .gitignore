@@ -7,4 +7,6 @@ RCS
 tmp
 *.tmp
 netineti.pyc
-
+netineti.py
+deploy.rb
+run_names_services

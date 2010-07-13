@@ -41919,9 +41919,6 @@ describe 'The Neti Neti ' do
     
     end
 
- #    ----- Error in NetiNeti (post '/tf_result'): wrong status line: "<html>" -----
- # ----- Error in NetiNeti (post '/tf_result'): Connection reset by peer -----
-  
     it "check index html" do
       get '/'
   #    last_response.should be_ok
