@@ -1,8 +1,11 @@
 # Machine Learning based approach to find scientific names
+# Input: Any text preferably in Engish
+# Output : A list of scientific names
+
 # Lakshmi Manohar Akella
 # Marine Biological Laboratory
-# Updated March 5 2010(ver 1.0)
-# April 2 2010
+# Updated May 26 2010(ver 0.927)
+
 
 import time
 import nltk
@@ -11,36 +14,46 @@ import random
 
 class NetiNetiTrain:
     
-        def __init__(self,species_train=None,irrelevant_text=None,neg_names=None,learning_algo = "NB"):
+        def __init__(self,species_train=None,num_examples = None,irrelevant_text=None,neg_names=None,all_names = None,learning_algo = "NB"):
                 if(species_train is None):
-                        species_train = "millionnames.txt"
+                        species_train = "species_train_big.txt"
+                if(num_examples is None):
+                        num_examples = 15000
                 if(irrelevant_text is None):
                         irrelevant_text = "pictorialgeo.txt"
                 if(neg_names is None):
                         neg_names = "neg_names.txt"
-                
+                if(all_names is None):
+                        all_names = "millionnames.txt"
                 self.species_train = species_train
+                self._num_examples = num_examples
                 self.irrelevant_text = irrelevant_text
                 self.neg_names = neg_names
+                self._all_names = all_names
                 self.learning_algo = learning_algo
+                self._buildTable()
                 self._buildFeatures(self._getTrainingData())
 
+        def _splitGet(self,fileName):
+                pdata = open(fileName).read()
+                tokens = pdata.split('\n')
+                #remove trailing spaces
+                tokens = map(lambda x:x.strip(),tokens)
+                return(tokens)
+                
 
         def _getTrainingData(self):
                 
-                pdata = open(self.species_train).read()
-                #root = '/Users/Manohar/Desktop/aging'
-                #reader=nltk.corpus.PlaintextCorpusReader(root,'species_train.txt')
-                ptokens = pdata.split('\n')
-                #remove trailing spaces
-                ptokens = map(lambda x:x.strip(),ptokens)
+                ptokens = self._splitGet(self.species_train)
                 nn = []
                 for n in ptokens:
                         p = n.split()
                         if(len(p) ==2):
                                 nn.append(p[0][0]+". "+p[1])
-                ptokens = ptokens+nn[:250]
 
+                if(len(ptokens)>self._num_examples+1):
+                        ptokens = ptokens[:self._num_examples]
+                ptokens = ptokens+nn[:360]
                 #positive data
                 tdata = [(pt,'taxon') for pt in ptokens]
 
@@ -53,7 +66,7 @@ class NetiNetiTrain:
                 bg = nltk.bigrams(ntokens)
                 tg = nltk.trigrams(ntokens)
                 n_tokens = nntokens+neg_names
-                n_bg =bg
+                n_bg = bg
                 n_tg = tg
                 nn_bg = set(n_bg)
                 tr = [ (a+' '+b,'not-a-taxon') for (a,b) in nn_bg]
@@ -68,112 +81,87 @@ class NetiNetiTrain:
 
                 allData = tdata+nndata
                 random.shuffle(allData)
-
+                allData = filter(lambda x: len(x[0])>=2,allData)
                 return(allData)
+
+        def _buildTable(self):
+                ta = time.clock()
+                ttokens = self._splitGet(self._all_names)
+                self._tab_hash = {}
+                for t in ttokens:
+                        self._tab_hash[t] = 1
+                tb = time.clock()
+                print str(tb-ta)
+                print len(self._tab_hash)
+
+        def _populateFeatures(self,array,idx,start,stop,features,name):
+                        
+                try:
+                        if(stop =="end"):
+                                features[name] = array[idx][start:]
+                        elif(stop =="sc"):
+                                features[name] = array[idx][start]
+                        else:
+                                features[name] = array[idx][start:stop]
+                except Exception:
+                        features[name] = 'NA'
+                return(features[name])
+        
+        def _incWeight(self,st_wt,inc,val):
+                if(val):
+                        return(st_wt+inc)
+                else:
+                        return(st_wt)
 
         def taxon_features(self,token):
                 features = {}
-                imp = False
-                flag = 0
                 swt = 5 # Weight Increment
                 vowels =['a','e','i','o','u']
                 sv = ['a','i','s','m']#last letter (LL) weight
                 sv1 =['e','o']# Reduced LL weight
                 svlb = ['i','u']# penultimate L weight
+               
                 string_weight = 0
+                
+                prts = token.split(" ")
+                self._populateFeatures(prts,0,-3,"end",features,"last3_first")
+                self._populateFeatures(prts,1,-3,"end",features,"last3_second")
+                self._populateFeatures(prts,2,-3,"end",features,"last3_third")
+                self._populateFeatures(prts,0,-2,"end",features,"last2_first")
+                self._populateFeatures(prts,1,-2,"end",features,"last2_second")
+                self._populateFeatures(prts,2,-2,"end",features,"last2_third")
+                self._populateFeatures(prts,0,0,"sc",features,"first_char")
+                self._populateFeatures(prts,0,-1,"sc",features,"last_char")
+                self._populateFeatures(prts,0,1,"sc",features,"second_char")
+                self._populateFeatures(prts,0,-2,"sc",features,"sec_last_char")
+
+                features["lastltr_of_fw_in_sv"] = j = self._populateFeatures(prts,0,-1,"sc",features,"lastltr_of_fw_in_sv") in sv
+                string_weight = self._incWeight(string_weight,swt,j)
+                features["lastltr_of_fw_in_svl"] = j = self._populateFeatures(prts,0,-1,"sc",features,"lastltr_of_fw_in_svl") in sv1
+                string_weight = self._incWeight(string_weight,swt-3,j)
+                features["lastltr_of_sw_in_sv"] = j = self._populateFeatures(prts,1,-1,"sc",features,"lastltr_of_sw_in_sv") in sv
+                string_weight = self._incWeight(string_weight,swt,j)
+                features["lastltr_of_sw_in_svl"] = j = self._populateFeatures(prts,1,-1,"sc",features,"lastltr_of_sw_in_svl") in sv1
+                string_weight = self._incWeight(string_weight,swt-3,j)
+                features["lastltr_of_tw_in_sv_or_svl"] = j = self._populateFeatures(prts,2,-1,"sc",features,"lastltr_of_tw_in_sv_or_svl") in sv+sv1
+                string_weight = self._incWeight(string_weight,swt-2,j)
+                features["last_letter_fw_vwl"] = prts[0][-1] in vowels
+
+                features["in_table"] = self._tab_hash.has_key(token)
+
+                try:
+                        features["1up_2_dot_restok"] = token[0].isupper() and token[1] is "." and token[2] is " " and token[3:].islower()
+                except Exception:
+                        features["1up_2_dot_restok"] = False
+                features["token"] = token
+                for vowel in'aeiou':
+                        
+                        features["count(%s)"%vowel] = token.lower().count(vowel)
+                        features["has(%s)"%vowel] = vowel in token
+                
                 imp = token[0].isupper() and token[1:].islower()
-                features["fl_caps_rest_small"] = imp
+                
 
-                parts = token.split()
-                k = parts[0].split('.')[0]
-                tparts = parts[1:]
-                tparts.insert(0,k)
-                isa = filter(lambda x:x.replace('-','').isalpha(),tparts)
-                alphatest = (len(isa) == len(parts))
-                features["aalpha"] = alphatest 
-                #features["len_first"] = len(parts[0])
-                
-                if(len(parts[0]) > 1 ):
-                        features["last_2ltrs_fw"] = parts[0][-2]+parts[0][-1]
-                        features["lastbutone_letter_fw_vwl"] = parts[0][-2] in vowels
-                        features["snd_chr_gdot"] = parts[0][1] is '.' and len(parts[0]) == 2
-                        if(len(parts[0])>2):
-                                features["last_3ltrs_fw"] = parts[0][-3]+parts[0][-2]+parts[0][-1]
-                        else:
-                                features["last_3ltrs_fw"]= " "+parts[0][-2]+parts[0][-1]
-
-                        if( parts[0][-1] in sv):
-                                string_weight = string_weight + swt
-                        elif( parts[0][-1] in sv1):
-                                string_weight = string_weight + swt-3
-                        if(parts[0][-2] in svlb):
-                                string_weight = string_weight + swt-2
-                   
-                   
-                else:
-                        features["last_2ltrs_fw"] = " "+parts[0][-1]
-                        features["lastbutone_letter_fw_vwl"] = 'z' in vowels
-                        features["snd_chr_gdot"] = False
-                        features["last_3ltrs_fw"] = "  "+parts[0][-1]
-                 
-                
-                if(len(parts) >= 2):
-                        features["fl_2nd_w_small"] = parts[1][0].islower()
-                        #safe
-                        if(parts[1][0].isupper()):
-                                flag =1
-                        #print parts[0]+'\t'+ parts[1]
-                        if(len(parts[1]) > 1):
-                                features["last_2ltrs_sw"] = parts[1][-2]+parts[1][-1]
-                                if(len(parts[1])>2):
-                                        features["last_3ltrs_sw"] = parts[1][-3]+parts[1][-2]+parts[1][-1]
-                                else:
-                                        features["last_3ltrs_sw"]= " "+parts[1][-2]+parts[1][-1]
-
-                                if( parts[1][-1] in sv):
-                                        string_weight = string_weight + swt
-                                elif(parts[1][-1] in sv1):
-                                        string_weight = string_weight + swt - 3
-                                if(parts[1][-2] in svlb):
-                                        string_weight = string_weight + swt-2
-                        else:
-                                features["last_2ltrs_sw"] = " "+parts[1][-1]
-                                features["last_3ltrs_sw"] = "  "+parts[1][-1]
-                else:
-                        features["last_2ltrs_sw"] = ''
-                        features["fl_2nd_w_small"] = False
-                        features["last_3ltrs_sw"] = ''
-                
-                    
-                if (len(parts) == 3):
-                        features["fl_3rd_w_small"] = parts[2][0].islower()
-                        #safe
-                        if(parts[2][0].isupper()):
-                                flag =1
-                        if(len(parts[2])> 1):
-                                features["last_2ltrs_3w"] = parts[2][-2]+parts[2][-1]
-                                if(parts[2][-1] in sv):
-                                        string_weight = string_weight + swt
-                                elif(parts[2][-1] in sv1):
-                                        string_weight = string_weight + swt - 3
-                                if(parts[2][-2] in svlb):
-                                        string_weight = string_weight + swt-2
-                        else:
-                                features["last_2ltrs_3w"] = " "+parts[2][-1]
-                else:
-                    #features["len_3rd"] = 0
-                    features["fl_3rd_w_small"] = False
-                    features["last_2ltrs_3w"] = "  "
-                    #features["Third_Word"] = ''
-                    
-                features["last_letter_fw_vwl"] = parts[0][-1] in vowels
-                
-             
-             
-                if(flag or not imp or not alphatest):
-                        string_weight  = 0
-
-                
                 if(string_weight > 18):
                         features["Str_Wgt"] = 'A'
                 elif(string_weight >14):
@@ -184,9 +172,10 @@ class NetiNetiTrain:
                         features["Str_Wgt"] = 'D'
                 else:
                         features["Str_Wgt"] = 'F'
-                
-                features['token'] = token       
+
+                features["imp_feature"] = imp
                 return features
+        
 
         def _buildFeatures(self,labeledData):
                 featuresets = [(self.taxon_features(data),label) for (data,label) in labeledData]
@@ -213,6 +202,7 @@ class nameFinder():
                         reml[a] = 1
                 self._remlist = reml
                 self._modelObject = modelObject
+                
         def _remDot(self,a):
                 if(a[-1] == '.' and len(a) > 2 ):
                         return(a[:-1])
@@ -223,7 +213,7 @@ class nameFinder():
                 e1 = a.split("-")
                 j = [self._remlist.has_key(w) for w in e1]
                 return(not True in j and not self._remlist.has_key(a.lower()))
-        
+
         def _isGood2(self,a,b):
                 if(len(a) >1 and len(b) >1):
                         td = (a[1] == '.' and len(a) ==2)
@@ -245,9 +235,9 @@ class nameFinder():
                 if(gr[1] =="." and gr[2] ==" "):
                         if(nhash.has_key(gr)):
                                 nms.append(self._remDot((a[0]+"["+nhash[gr]+"]"+" "+b+" "+c).strip()))
-                        elif(a[0] == last_genus[0] and last_genus):
+                        elif(last_genus and a[0] == last_genus[0]):
                                 nms.append(self._remDot((a[0]+"["+last_genus[1:]+"]"+" "+b+" "+c).strip()))
-                        elif(a[0]==plg and plg):
+                        elif(plg and a[0]==plg):
                                 nms.append(self._remDot((a[0]+"["+plg[1:]+"]"+" "+b+" "+c).strip()))
                         else:
                                 nms.append(gr)
@@ -294,10 +284,10 @@ class nameFinder():
                 nhash = {}
                 ts = time.clock()
                 if(len(token) ==2):
-                        if(self._isGood2(token[0],token[1]) and taxonTest(token[0]+" "+token[1])):
+                        if(self._isGood2(token[0],token[1]) and self._taxonTest(token[0]+" "+token[1])):
                                 nms.append(token[0]+" "+token[1])
                 elif(len(token)==1):
-                        if(token[0][0].isupper() and token[0].isalpha() and hCheck(token[0]) and len(token[0])>2 and taxonTest(token[0])):
+                        if(token[0][0].isupper() and token[0].isalpha() and hCheck(token[0]) and len(token[0])>2 and self._taxonTest(token[0])):
                                 nms.append(token[0])
 
                 else:
@@ -329,8 +319,8 @@ class nameFinder():
                                                 self._resolve(a,b,"",nhash,nms,last_genus,prev_last_genus)
 				
 				elif(a[0].isupper() and a.isalpha() and self._hCheck(a) and len(a)>2):
-                                        if(self._taxonTest(a)):
-                                                nms.append(a)
+                                        if(self._taxonTest(self._remDot(a))):
+                                                nms.append(self._remDot(a))
 		try:
                         if(self._isGood2(tgr[-1][-2],tgr[-1][-1])):
                                 if(self._taxonTest(self._remDot(tgr[-1][-2]+" "+tgr[-1][-1]))):
@@ -340,7 +330,7 @@ class nameFinder():
                                         if(self._taxonTest(tgr[-1][-2])):
                                                 nms.append(tgr[-1][-2])
 		except Exception:
-                        print token
+                        print ""
 		te = time.clock()
 		#print (te-ts)
 		return(nms)
