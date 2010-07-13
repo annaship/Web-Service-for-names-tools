@@ -1,6 +1,7 @@
 <%= partial(:menu, :kind => "neti_tf") %>
 
 <h3>Neti Neti Taxon Finder</h3>     
+<!-- <h4>Name Extraction from Textual Information - Name Extraction for Taxonomic Indexing</h4>    -->
 
 <br/>
 <br/>
@@ -14,9 +15,7 @@
 
 <br />
 
-<%# unless @page_res.to_s.empty? %>
-	<%#= will_paginate @page_res %>
-
+<% unless @tf_result.to_s.empty? %>
 	<table class='nice'>
 		<tr>
 	    <th>Verbatim String (as appears in text)</th>
@@ -26,7 +25,6 @@
 			<tr><td><%= name[0] %></td><td><%= name[1] %></td></tr>
 		<% end %>
 	</table>
-<%# end %>
-
+<% end %>
 <!-- <a href='/call_for_rec'>Reconcile</a> -->
 

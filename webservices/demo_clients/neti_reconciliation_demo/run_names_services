@@ -1,10 +1,10 @@
 #! /bin/bash
 
 
-cd ../../../../netineti/trunk/
+cd /Users/anna/work/web_services/under_svn/new/netineti
 python neti-server.py &
 
-cd ../../webservices/trunk/ruby/
+cd /Users/anna/work/web_services/under_svn/new/webservices/ruby/trunk
 ruby taxon_finder_web_service.rb &
 
 # reconciliation
@@ -13,5 +13,5 @@ ruby taxon_finder_web_service.rb &
 #cd ../webservice
 #ruby reconcile_web_service.rb -p 3000 &
 
-cd ../../webservices/trunk/demo_clients/neti_reconciliation_demo
+cd /Users/anna/work/web_services/under_svn/new/webservices/demo_clients/neti_reconciliation_demo/trunk
 ruby names_tools.rb -p 3001 &

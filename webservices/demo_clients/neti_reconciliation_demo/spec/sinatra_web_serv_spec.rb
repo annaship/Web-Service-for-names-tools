@@ -41919,6 +41919,9 @@ describe 'The Neti Neti ' do
     
     end
 
+ #    ----- Error in NetiNeti (post '/tf_result'): wrong status line: "<html>" -----
+ # ----- Error in NetiNeti (post '/tf_result'): Connection reset by peer -----
+  
     it "check index html" do
       get '/'
   #    last_response.should be_ok
@@ -41962,6 +41965,14 @@ describe 'The Neti Neti ' do
       # last_response.should be_ok
       last_response.body.should_not include("Reading")
       last_response.body.should include("<td>Ahys sandersoni</td>")
+    end    
+
+    it "should take text and return empty table if there's no result" do
+      text = "There are many good species here." #URI.escape doesn't work, why?
+      post "/tf_result", params = {"url"=>"", "url_e"=>"none", "text"=>text}
+      # get "/tf_result"
+      # last_response.should be_ok
+      last_response.body.should include("Total strings: 0")
     end    
     
     # it "should take text with a semicolon and return text" do
