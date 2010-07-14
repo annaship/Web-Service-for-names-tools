@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'sinatra'
 require File.dirname(__FILE__) + '/lib/recon_client'
-# require File.dirname(__FILE__) + '/lib/neti_taxon_finder_client'
+require File.dirname(__FILE__) + '/lib/app_lib.rb'
 require 'nokogiri'
 require 'uri'
 require 'open-uri'
@@ -13,80 +13,80 @@ require 'ruby-debug'
 set :show_exceptions, false
 
 # Array of allowed formats
-@@valid_formats = %w[xml json]
-@@valid_types = %w[text url encodedtext encodedurl]
-
 #show user an info page if they hit the index
 get '/' do
-  "Taxon Name Finding API, documentation at http://code.google.com/p/taxon-name-processing"
+  "Reconciliation API"
 end
 
 get '/match' do
-  # @@client = TaxonFinderClient.new 'localhost' 
-  # @@client = NetiTaxonFinderClient.new 'localhost' 
-  @@client = ReconicliationClient.new 'localhost' 
-  format = @@valid_formats.include?(params[:format]) ? params[:format] : "xml"
+  read_config
+  client = ReconicliationClient.new @host
+  puts params.inspect
+  puts "=" * 80
+
   
-  begin
+  # begin
     content1 = ""
     content2 = ""
     params.each do |key, value| 
       if key.end_with? "1"
-        # print "\nkey = %s\n" % key 
+        print "reconc_web_service: \nkey = %s\n" % key 
         content1 = value
       elsif key.end_with? "2"
-        # print "\nkey = %s\n" % key
+        print "reconc_web_service: \nkey = %s\n" % key
         content2 = value
       end
-      # print "content1 = %s, content2 = %s\n" % [content1, content2]
+      print "reconc_web_service: content1 = %s, content2 = %s\n" % [content1, content2]
     end
+    # input1 = URI.unescape(params[:input1])
+    # input2 = URI.unescape(params[:input2])
+    # 
+    # # fmt = params[:format] || 'xml'
+    # type1 = params[:type1] || 'text'
+    # type2 = params[:type2] || 'text'
 
-    # content1 = params[:text1] || params[:url1] || params[:encodedtext1] || params[:encodedurl1]
-    # content2 = params[:text2] || params[:url2] || params[:encodedtext2] || params[:encodedurl2]
-  rescue
-    status 400
-  end
+  # rescue
+  #   status 400
+  # end
 
-  # print "UUU content1 = %s, content2 = %s\n" % [content1, content2]
+  print "reconc_web_service: UUU content1 = %s, content2 = %s\n" % [content1, content2]
+  # UUU content1 = http://localhost/text_bad.txt, content2 = http://localhost/text_good.txt
 
   content1 = take_content(content1)
   content2 = take_content(content2)
   
-  # content1 = URI.unescape content1
-  # content2 = URI.unescape content2
-  # # decode if it's encoded
-  # content1 = Base64::decode64 content1 if params[:encodedtext1] || params[:encodedurl1]
-  # content2 = Base64::decode64 content2 if params[:encodedtext2] || params[:encodedurl2]
-  
+  print "reconc_web_service: 222 content1 = %s, content2 = %s\n" % [content1, content2]
+
   # scrape if it's a url
   content1 = read_content(content1) if params[:encodedurl1] || params[:url1]
   content2 = read_content(content2) if params[:encodedurl2] || params[:url2]
 
   content = content1 + "&&&EOF&&&" + content2     
-  
-  names = @@client.match(content)
+  print "reconc_web_service: UUU content1 = %s, content2 = %s\n" % [content1, content2]
+  puts "reconc_web_service: content = #{content}\n" 
+  names = client.match(content)
+  puts "reconc_web_service: names = #{names}\n" 
 
-  if format == 'json'
-    content_type 'application/json', :charset => 'utf-8'
-    return Hash.from_xml("#{to_xml(names)}").to_json
-  end
+  # if format == 'json'
+  #   content_type 'application/json', :charset => 'utf-8'
+  #   return Hash.from_xml("#{to_xml(names)}").to_json
+  # end
   
-  # content_type 'text/xml', :charset => 'utf-8'
-  # to_xml(names)
-  content_type 'text/HTML', :charset => 'utf-8'
+  # content_type 'text/HTML', :charset => 'utf-8'
   # "<html><head></head><body>"+names+"</body></html>"
-  names
+  return names
 end
 
 private
 
 def read_content(content)
-  begin
+  puts "reconc_web_service: IN read_content --------"
+  # begin
     response  = open(content)
     pure_text = open(content).read
-  rescue
-    status 400
-  end
+  # rescue
+  #   status 400
+  # end
   content = pure_text if pure_text
   # use nokogiri only for HTML, because otherwise it stops on OCR errors
   # content = Nokogiri::HTML(response).content if pure_text.include?("<html>")    
@@ -95,6 +95,7 @@ def read_content(content)
 end
 
 def take_content(content)
+  puts "reconc_web_service: IN take_content --------"
   content = URI.unescape content
   # # decode if it's encoded
   params.each_key do |key|
