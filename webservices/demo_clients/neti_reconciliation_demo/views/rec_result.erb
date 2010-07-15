@@ -5,14 +5,16 @@
 
 <br />
 <br />
-<table class='nice'>
-	<tr>
-	  <th>Name to compare</th><th></th>
-	  <th>Matched name</th>
-	</tr>   
-	<% @arr.each do |name| %>
+<% unless @arr.to_s.empty? %>
+	<table class='nice'>
 		<tr>
-			<td><%= name.keys[0] %></td> <td>---></td> <td><%= name.values[0]%></td>
-		</tr>
-	<% end %>
-</table>
+		  <th>Name to compare</th><th></th>
+		  <th>Matched name</th>
+		</tr>   
+		<% @arr.each do |name| %>
+			<tr>
+				<td><%= name.keys[0] %></td> <td>---></td> <td><%= name.values[0]%></td>
+			</tr>
+		<% end %>
+	</table>
+<% end %>

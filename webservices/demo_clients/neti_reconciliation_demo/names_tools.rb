@@ -91,21 +91,15 @@ post '/tf_result' do
     if xml_data
       data = XmlSimple.xml_in(xml_data)
       neti_result_fn = set_result(data)
-      puts "Here: neti_result_fn = #{neti_result_fn}"
       t1 = Time.now.to_f
     end
     @time_result = sprintf("%5.5f", t1-t)
-    # aa = neti_result_fn
-    # .gsub(/\//, '')
-    # aa = neti_result_fn.gsub(/^.+\/(.+)$/, '\1')
-    # @neti_result_f_name = neti_result_fn.gsub(/@upload_dir/, '')
-    # puts "=" * 80
-    # puts "aa = #{aa}, upload_dir = #{@upload_dir}, neti_result_fn = #{neti_result_fn}"
-    erb :tf_result, :locals => { :neti_result_f_name => neti_result_fn.gsub(/^.+\/(.+)$/, '\1') }
+    neti_result_fn = neti_result_fn.gsub(/^.+\/(.+)$/, '\1') unless neti_result_fn.to_s.empty? 
+     # if neti_result_fn
+    erb :tf_result, :locals => { :neti_result_f_name => neti_result_fn }
   rescue Exception => err
     puts "----- Error in Neti Neti (post '/tf_result'): %s -----\n" % err
-    err_trace = err.backtrace.join("\n")
-    puts err_trace
+    puts err.backtrace.join("\n")
     erb :err_message
   end
 end
@@ -120,14 +114,18 @@ get '/recon' do
 end
 
 get '/call_for_rec' do
-  @neti_result_fname = params[:neti_result_f_name]
+  @neti_result_fname = ""
+  if params[:neti_result_f_name]
+    res_name = params[:neti_result_f_name]
+    @neti_result_fname = res_name 
+  end
   erb :call_for_rec
 end
 
 post '/submit' do
   begin
     @rec_num = 0
-    
+
     @url2 = @master_lists_dir+params['url_e'] if (params['url_e'] && params['url_e'] != "none" && !params['url_e'].empty?)
   
     if (@url1 && @url2)
@@ -143,13 +141,14 @@ post '/submit' do
       name_bad, name_good = names.split(" ---> ")
       # to_s to work with nil and ""
       unless (name_bad.to_s.empty? || name_good.to_s.empty?)
-        @rec_num += 1 
         @arr << {name_bad, name_good}
+        @rec_num += 1 
       end
     end
     erb :rec_result
   rescue Exception => err
     puts "----- Error in reconciliation: %s -----\n" % err
+    puts err.backtrace.join("\n")
     erb :err_message
   end
 end

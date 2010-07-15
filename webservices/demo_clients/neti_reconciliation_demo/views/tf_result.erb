@@ -26,8 +26,9 @@
 		<% end %>
 	</table>
 <% end %>
-<hr/>
 
-<%#= neti_result_f_name %>
-<a href='/call_for_rec?neti_result_f_name=<%= neti_result_f_name%>'>Reconcile</a>
-<!-- <a href="page2c.php?myNumber=1&myFruit=orange">Send variables via URL!</a>  -->
+<br />
+
+<% unless @i == 0 %>
+	<a href='/call_for_rec?neti_result_f_name=<%= neti_result_f_name%>'>Reconcile</a>
+<% end %>
