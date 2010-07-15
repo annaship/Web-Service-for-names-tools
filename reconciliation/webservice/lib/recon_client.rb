@@ -22,8 +22,13 @@ class ReconicliationClient
     socket.write("Content-length: #{data_length}\r\n")
     socket.write(data)
     socket.flush
+    # puts "data = " + data[-100, 100].to_s
 
-    output = socket.read(data_length)
+    output = ""
+    while !socket.eof? do
+      output += socket.read(1024)
+    end
+    # puts "client: output = #{output}"
     socket.close 
 
     @matches = output
