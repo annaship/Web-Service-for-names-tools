@@ -22,13 +22,9 @@ class ThreadedNetiHandler(SocketServer.StreamRequestHandler):
 			list_first  = take_set(first)
 			list_second = take_set(second)
 			for a in list_first:
-				print "a = %s\n" % a
 				for b in list_second:
-					print "b = %s\n" % b
 					arr1.append(a + " ---> " + b)
-					print "arr1 = %s\n" % arr1
 					res = "\n".join(arr1)
-					print "res = %s\n" % res
 			return res
 
 		data = ''
@@ -40,7 +36,6 @@ class ThreadedNetiHandler(SocketServer.StreamRequestHandler):
 		data = self.rfile.read(content_length)
 
 		text1, text2 = data.split("&&&EOF&&&")
-		print "server: text1 = %s, text2 = %s" % (text1, text2)
     # change dummy_comparison with actual reconciliation method
 		reconciliation_res = dummy_comparison(text1, text2)
 		self.request.send(reconciliation_res)
